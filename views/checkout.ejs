@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout | Roamly</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Tailwind + Razorpay -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900 min-h-screen">
+
+  <!-- NAV -->
+  <nav class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
+      <a href="/explore" class="text-sm text-gray-600">← Checkout</a>
+      <img src="https://via.placeholder.com/120x40?text=Roamly" class="h-8">
+    </div>
+  </nav>
+
+  <section class="max-w-4xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+    <!-- LEFT FORM (just UI, doesn't submit anywhere) -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h2 class="text-lg font-bold mb-4">Checkout</h2>
+
+      <form class="space-y-4" id="checkoutForm">
+        <input
+          id="name"
+          required
+          placeholder="Full name"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <input
+          id="email"
+          type="email"
+          required
+          placeholder="Email"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <input
+          placeholder="Promo code"
+          class="w-full p-3 border rounded-lg"
+        />
+
+        <label class="flex gap-2 items-center text-sm text-gray-600">
+          <input type="checkbox" id="terms" />
+          I agree to terms and cancellation policy
+        </label>
+      </form>
+    </div>
+
+    <!-- RIGHT SUMMARY -->
+    <div class="bg-white p-6 rounded-xl shadow h-fit">
+      <h3 class="font-semibold mb-4">Booking Summary</h3>
+
+      <div class="text-sm text-gray-600 space-y-2">
+        <div class="flex justify-between">
+          <span>Experience</span>
+          <span><%= experience.title %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Date</span>
+          <span><%= date %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Time</span>
+          <span><%= time %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Qty</span>
+          <span><%= qty %></span>
+        </div>
+
+        <hr>
+
+        <div class="flex justify-between">
+          <span>Subtotal</span>
+          <span>₹<%= subtotal %></span>
+        </div>
+
+        <div class="flex justify-between">
+          <span>Taxes</span>
+          <span>₹59</span>
+        </div>
+
+        <div class="flex justify-between font-bold text-lg">
+          <span>Total</span>
+          <span>₹<%= total %></span>
+        </div>
+      </div>
+
+      <!-- ✅ Pay button (NOT inside a submitting form) -->
+      <button
+        type="button"
+        id="payBtn"
+        class="w-full mt-6 bg-yellow-400 py-4 rounded-lg font-bold">
+        Pay and Confirm
+      </button>
+
+      <!-- Cancel booking form (separate, fine) -->
+      <form
+        action="/booking/<%= bookingId %>/cancel"
+        method="POST"
+        class="mt-4"
+      >
+        <button
+          class="w-full bg-red-100 text-red-600 py-3 rounded-lg font-semibold hover:bg-red-200">
+          Cancel Booking
+        </button>
+      </form>
+    </div>
+
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const payBtn = document.getElementById("payBtn");
+      const nameInput = document.getElementById("name");
+      const emailInput = document.getElementById("email");
+      const termsCheckbox = document.getElementById("terms");
+
+      function formValid() {
+        return (
+          nameInput.value.trim() !== "" &&
+          emailInput.value.trim() !== "" &&
+          termsCheckbox.checked
+        );
+      }
+
+      payBtn.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        if (!formValid()) {
+          alert("Fill name, email and accept terms before paying.");
+          return;
+        }
+
+        console.log("✅ Pay button clicked");
+
+        // 1) Create Razorpay order from backend
+        const res = await fetch("/payment/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ bookingId: "<%= bookingId %>" })
+        });
+
+        const data = await res.json();
+        console.log("✅ Order response:", data);
+
+        if (!data.orderId) {
+          alert(data.error || "Unable to create payment order");
+          return;
+        }
+
+        // 2) Open Razorpay popup
+        const options = {
+          key: process.env.RAZORPAY_KEY_ID,
+          amount: data.amount * 100,
+          currency: "INR",
+          name: "Roamly",
+          description: "Experience Booking",
+          order_id: data.orderId,
+
+          handler: async function (response) {
+            // 3) Verify payment + mark booking paid
+            await fetch("/payment/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                bookingId: "<%= bookingId %>",
+                razorpay_payment_id: response.razorpay_payment_id
+              })
+            });
+
+            window.location.href = "/my-bookings";
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= experience.title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
+    <a href="/explore" class="text-sm text-gray-600">← Details</a>
+    <span class="font-semibold">Roamly</span>
+  </div>
+</nav>
+
+<section class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+  <!-- LEFT SIDE -->
+  <div class="lg:col-span-2">
+
+    <img src="<%= experience.image %>"
+      class="rounded-xl w-full h-[360px] object-cover" />
+
+    <h1 class="text-xl font-semibold mt-6"><%= experience.title %></h1>
+
+    <p class="text-sm text-gray-600 mt-2 max-w-2xl">
+      <%= experience.description %>
+    </p>
+
+    <!-- DATE SELECTION -->
+    <div class="mt-8">
+      <h3 class="font-medium mb-3">Choose date</h3>
+
+      <div class="flex gap-3 flex-wrap">
+        <% Object.keys(experience.availability).forEach(date => { %>
+          <button
+            class="date-chip px-4 py-2 border rounded-md text-sm text-gray-700"
+            onclick="selectDate('<%= date %>', this)">
+            <%= date %>
+          </button>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- TIME SELECTION -->
+    <div class="mt-6">
+      <h3 class="font-medium mb-3">Choose time</h3>
+
+      <div id="timeSlots" class="flex gap-3 flex-wrap text-sm">
+        <span class="text-gray-400">Select a date first</span>
+      </div>
+
+      <p class="text-xs text-gray-400 mt-2">
+        All times are in IST (GMT +5:30)
+      </p>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="mt-10">
+      <h3 class="font-medium mb-2">About</h3>
+      <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg">
+        <%= experience.highlights %>
+      </p>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE (PRICE BOX) -->
+  <div class="bg-gray-50 p-6 rounded-xl h-fit sticky top-24">
+
+    <div class="flex justify-between text-sm text-gray-600 mb-2">
+      <span>Starts at</span>
+      <span class="font-semibold">₹<%= experience.price %></span>
+    </div>
+    <div class="text-sm text-gray-600 space-y-1 mb-4">
+  <div class="flex justify-between">
+    <span>Date</span>
+    <span id="summaryDate">—</span>
+  </div>
+  <div class="flex justify-between">
+    <span>Time</span>
+    <span id="summaryTime">—</span>
+  </div>
+</div>
+
+    <div class="flex justify-between text-sm mt-3">
+      <span>Quantity</span>
+      <div class="flex items-center gap-2">
+        <button onclick="changeQty(-1)" class="border px-2 rounded">−</button>
+        <span id="qty">1</span>
+        <button onclick="changeQty(1)" class="border px-2 rounded">+</button>
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="flex justify-between text-sm">
+      <span>Subtotal</span>
+      <span>₹<span id="subTotal"><%= experience.price %></span></span>
+    </div>
+
+    <div class="flex justify-between text-sm mt-1">
+      <span>Taxes</span>
+      <span>₹59</span>
+    </div>
+
+    <div class="flex justify-between font-semibold text-base mt-2">
+      <span>Total</span>
+      <span>₹<span id="total"><%= experience.price + 59 %></span></span>
+    </div>
+
+    <button
+      id="confirmBtn"
+      disabled
+      class="mt-5 w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-medium cursor-not-allowed">
+      Confirm
+    </button>
+
+  </div>
+
+</section>
+
+<!-- SCRIPT -->
+<script>
+  const availability = <%- JSON.stringify(experience.availability) %>;
+  const price = <%= experience.price %>;
+  const experienceId = "<%= experience._id %>";
+
+  let qty = 1;
+  let selectedDate = null;
+  let selectedTime = null;
+
+  const summaryDate = document.getElementById("summaryDate");
+  const summaryTime = document.getElementById("summaryTime");
+  const confirmBtn = document.getElementById("confirmBtn");
+  const timeSlots = document.getElementById("timeSlots");
+
+  function selectDate(date, btn) {
+    selectedDate = date;
+    selectedTime = null;
+
+    summaryDate.textContent = date;
+    summaryTime.textContent = "—";
+
+    // Reset date styles
+    document.querySelectorAll(".date-chip")
+      .forEach(b => b.classList.remove("bg-yellow-400"));
+
+    btn.classList.add("bg-yellow-400");
+
+    // Clear old times
+    timeSlots.innerHTML = "";
+
+    availability[date].forEach(t => {
+      const b = document.createElement("button");
+      b.className = "px-4 py-2 border rounded-md text-sm";
+
+      if (t.slots === 0) {
+        b.textContent = `${t.time} • Sold out`;
+        b.disabled = true;
+        b.classList.add("bg-gray-200", "text-gray-400");
+      } else {
+        const warning =
+          t.slots <= 3
+            ? `<span class="text-red-500 ml-1">(${t.slots} left • booking fast)</span>`
+            : `<span class="text-gray-500 ml-1">(${t.slots} left)</span>`;
+
+        b.innerHTML = `${t.time} ${warning}`;
+
+        b.onclick = () => {
+          selectTime(t.time, b);
+        };
+      }
+
+      timeSlots.appendChild(b);
+    });
+
+    disableConfirm();
+  }
+
+  function selectTime(time, btn) {
+    selectedTime = time;
+    summaryTime.textContent = time;
+
+    document.querySelectorAll("#timeSlots button")
+      .forEach(b => b.classList.remove("bg-yellow-300"));
+
+    btn.classList.add("bg-yellow-300");
+    enableConfirm();
+  }
+
+  function changeQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById("qty").textContent = qty;
+    document.getElementById("subTotal").textContent = price * qty;
+    document.getElementById("total").textContent = price * qty + 59;
+  }
+
+  function enableConfirm() {
+    confirmBtn.disabled = false;
+    confirmBtn.className =
+      "mt-5 w-full bg-yellow-400 hover:bg-yellow-500 py-3 rounded-lg font-medium";
+  }
+
+  function disableConfirm() {
+    confirmBtn.disabled = true;
+    confirmBtn.className =
+      "mt-5 w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-medium cursor-not-allowed";
+  }
+
+  confirmBtn.onclick = () => {
+    if (!selectedDate || !selectedTime) return;
+
+    fetch("/book", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        experienceId,
+        date: selectedDate,
+        time: selectedTime,
+        qty
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        alert(data.message);
+      } else {
+        window.location.href = `/checkout/${data.bookingId}`;
+      }
+    });
+  };
+</script>
+
+
+</body>
+</html>

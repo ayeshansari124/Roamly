@@ -1,0 +1,27 @@
+<h1 class="text-2xl font-bold mb-6">My Bookings</h1>
+
+<% bookings.forEach(b => { %>
+  <div class="bg-white p-4 mb-4 rounded shadow">
+    <h3 class="font-semibold"><%= b.experienceId.title %></h3>
+    <p class="text-sm text-gray-600">
+      <%= b.date %> • <%= b.time %> • Qty: <%= b.qty %>
+    </p>
+
+    <% if (b.status === "confirmed") { %>
+      <form method="POST" action="/booking/<%= b._id %>/cancel">
+        <button class="mt-3 text-red-600 font-semibold">Cancel</button>
+      </form>
+    <% } else { %>
+      <p class="text-red-500 mt-2">Cancelled</p>
+    <% } %>
+  </div>
+  <p class="text-sm text-gray-600">
+  Payment: 
+  <% if (b.paymentStatus === "paid") { %>
+    <span class="text-green-600 font-semibold">Paid</span>
+  <% } else { %>
+    <span class="text-orange-500">Pending</span>
+  <% } %>
+</p>
+
+<% }) %>

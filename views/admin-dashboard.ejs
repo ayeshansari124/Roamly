@@ -1,0 +1,19 @@
+<h1 class="text-2xl font-bold mb-6">Admin – All Bookings</h1>
+
+<% bookings.forEach(b => { %>
+  <div class="bg-white p-4 mb-4 rounded shadow">
+    <p><b>User:</b> <%= b.userId.email %></p>
+    <p><b>Experience:</b> <%= b.experienceId.title %></p>
+    <p><b>Date:</b> <%= b.date %> | <b>Time:</b> <%= b.time %></p>
+    <p><b>Qty:</b> <%= b.qty %></p>
+    <p><b>Status:</b> <%= b.status %></p>
+
+    <% if (b.status === "confirmed") { %>
+      <form method="POST" action="/booking/<%= b._id %>/cancel">
+        <button class="mt-2 bg-red-100 text-red-600 px-3 py-1 rounded">
+          Cancel Booking
+        </button>
+      </form>
+    <% } %>
+  </div>
+<% }) %>
