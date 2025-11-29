@@ -121,76 +121,53 @@
   </section>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const payBtn = document.getElementById("payBtn");
-      const nameInput = document.getElementById("name");
-      const emailInput = document.getElementById("email");
-      const termsCheckbox = document.getElementById("terms");
+document.addEventListener("DOMContentLoaded", function () {
+  const payBtn = document.getElementById("payBtn");
 
-      function formValid() {
-        return (
-          nameInput.value.trim() !== "" &&
-          emailInput.value.trim() !== "" &&
-          termsCheckbox.checked
-        );
-      }
+  payBtn.addEventListener("click", async function () {
+    const res = await fetch("/payment/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ bookingId: "<%= bookingId %>" })
+    });
 
-      payBtn.addEventListener("click", async function (e) {
-        e.preventDefault();
+    const data = await res.json();
 
-        if (!formValid()) {
-          alert("Fill name, email and accept terms before paying.");
-          return;
-        }
+    if (!data.orderId) {
+      alert("Order creation failed");
+      return;
+    }
 
-        console.log("✅ Pay button clicked");
+    const options = {
+      key: "<%= razorpayKey %>",   // ✅ THE FIX
+      amount: data.amount * 100,
+      currency: "INR",
+      name: "Roamly",
+      description: "Experience Booking",
+      order_id: data.orderId,
 
-        // 1) Create Razorpay order from backend
-        const res = await fetch("/payment/create-order", {
+      handler: async function (response) {
+        await fetch("/payment/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ bookingId: "<%= bookingId %>" })
+          body: JSON.stringify({
+            bookingId: "<%= bookingId %>",
+            razorpay_payment_id: response.razorpay_payment_id
+          })
         });
 
-        const data = await res.json();
-        console.log("✅ Order response:", data);
+        window.location.href = "/my-bookings";
+      }
+    };
 
-        if (!data.orderId) {
-          alert(data.error || "Unable to create payment order");
-          return;
-        }
+    const rzp = new Razorpay(options);
+    rzp.open();
+  });
+});
+</script>
 
-        // 2) Open Razorpay popup
-        const options = {
-          key: process.env.RAZORPAY_KEY_ID,
-          amount: data.amount * 100,
-          currency: "INR",
-          name: "Roamly",
-          description: "Experience Booking",
-          order_id: data.orderId,
-
-          handler: async function (response) {
-            // 3) Verify payment + mark booking paid
-            await fetch("/payment/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({
-                bookingId: "<%= bookingId %>",
-                razorpay_payment_id: response.razorpay_payment_id
-              })
-            });
-
-            window.location.href = "/my-bookings";
-          }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.open();
-      });
-    });
-  </script>
 
 </body>
 </html>

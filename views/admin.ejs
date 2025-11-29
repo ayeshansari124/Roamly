@@ -8,48 +8,114 @@
 
 <body class="bg-gray-100 p-10">
 
-  <h1 class="text-2xl font-bold mb-6">Admin – Add Experience</h1>
+<h1 class="text-2xl font-bold mb-6">Admin – Add Experience</h1>
 
-  <form action="/admin/trips" method="POST" class="bg-white p-6 rounded-xl shadow space-y-4 max-w-xl">
+<form action="/admin/trips" method="POST"
+  class="bg-white p-6 rounded-xl shadow space-y-4 max-w-2xl">
 
-    <input name="title" placeholder="Title" required class="input">
-    <input name="location" placeholder="Location" required class="input">
-    <input name="price" type="number" placeholder="Price" required class="input">
-    <input name="duration" placeholder="Duration" required class="input">
-    <input name="image" placeholder="Image URL" required class="input">
+  <input name="title" placeholder="Title" required class="input">
+  <input name="location" placeholder="Location" required class="input">
+  <input name="price" type="number" placeholder="Price" required class="input">
+  <input name="duration" placeholder="Duration" required class="input">
+  <input name="image" placeholder="Image URL" required class="input">
 
-    <textarea name="description" placeholder="Description" class="input"></textarea>
+  <textarea name="description" placeholder="Description" class="input"></textarea>
+  <textarea name="highlights"
+    placeholder="Highlights (comma separated)"
+    class="input"></textarea>
 
-    <textarea name="highlights" placeholder="Highlights (comma separated)" class="input"></textarea>
+  <!-- AVAILABILITY BUILDER -->
+  <div class="border rounded-lg p-4 bg-gray-50">
+    <h3 class="font-semibold mb-3">Availability</h3>
 
-    <textarea
-      name="availability"
-      class="input h-32"
-      placeholder='{
-  "Oct 22": [
-    { "time": "07:00 am", "slots": 4 },
-    { "time": "09:00 am", "slots": 2 }
-  ],
-  "Oct 23": [
-    { "time": "08:00 am", "slots": 3 }
-  ]
-}'>
-    </textarea>
+    <div class="grid grid-cols-3 gap-2 mb-3">
+      <input type="date" id="date" class="input">
+      <input type="time" id="time" class="input">
+      <input type="number" id="slots" placeholder="Slots" class="input">
+    </div>
 
-    <button class="w-full bg-yellow-400 py-3 rounded-lg font-bold">
-      Save Experience
+    <button type="button"
+      onclick="addSlot()"
+      class="bg-yellow-400 px-4 py-2 rounded font-semibold">
+      Add Slot
     </button>
 
-  </form>
+    <!-- PREVIEW -->
+    <div id="availabilityPreview" class="mt-4 space-y-2 text-sm"></div>
 
-  <style>
-    .input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    <!-- hidden input sent to server -->
+    <input type="hidden" name="availability" id="availabilityInput">
+  </div>
+
+  <button
+    class="w-full bg-green-500 text-white py-3 rounded-lg font-bold">
+    Save Experience
+  </button>
+
+</form>
+
+<style>
+  .input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+</style>
+
+<script>
+  const availability = {};
+
+  function addSlot() {
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("time").value;
+    const slots = parseInt(document.getElementById("slots").value);
+
+    if (!date || !time || !slots) {
+      alert("Fill date, time and slots");
+      return;
     }
-  </style>
+
+    if (!availability[date]) {
+      availability[date] = [];
+    }
+
+    availability[date].push({
+      time: formatTime(time),
+      slots
+    });
+
+    renderPreview();
+    document.getElementById("availabilityInput").value =
+      JSON.stringify(availability);
+
+    // reset
+    document.getElementById("time").value = "";
+    document.getElementById("slots").value = "";
+  }
+
+  function formatTime(t) {
+    const [h, m] = t.split(":");
+    const hour = +h % 12 || 12;
+    const ampm = h >= 12 ? "PM" : "AM";
+    return `${hour}:${m} ${ampm}`;
+  }
+
+  function renderPreview() {
+    const div = document.getElementById("availabilityPreview");
+    div.innerHTML = "";
+
+    for (const date in availability) {
+      const section = document.createElement("div");
+      section.innerHTML = `<strong>${date}</strong>: ` +
+        availability[date]
+          .map(s => `${s.time} (${s.slots})`)
+          .join(", ");
+
+      div.appendChild(section);
+    }
+  }
+</script>
 
 </body>
 </html>

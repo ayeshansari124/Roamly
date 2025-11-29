@@ -15,9 +15,16 @@ mongoose
   .catch(err => console.error(err));
 
 app.use(session({
-  secret: "roamly_secret_key",
+  name: "roamly.sid",
+  secret: process.env.SESSION_SECRET || "roamly_secret_key",
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,        // ✅ JS cannot access cookie
+    secure: false,         // ✅ change to true when HTTPS
+    sameSite: "lax",       // ✅ CSRF protection
+    maxAge: 1000 * 60 * 60 * 24 // ✅ 1 day
+  }
 }));
 
 app.use(express.json());
@@ -59,22 +66,55 @@ app.get("/", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const user = await User.create(req.body);
+  const { name, email, password } = req.body;
+
+  const existing = await User.findOne({ email });
+  if (existing) {
+    return res.send("User already exists");
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password
+  });
+
   req.session.userId = user._id;
   res.redirect("/explore");
 });
+
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email, password });
-  if (!user) return res.send("Invalid credentials");
-  req.session.userId = user._id;
-  res.redirect("/explore");
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.send("Invalid credentials");
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    return res.send("Invalid credentials");
+  }
+
+  // ✅ Regenerate session (prevents fixation attacks)
+  req.session.regenerate(err => {
+    if (err) return res.send("Session error");
+
+    req.session.userId = user._id;
+    res.redirect("/explore");
+  });
 });
 
 app.post("/logout", (req, res) => {
-  req.session.destroy(() => res.redirect("/"));
+  req.session.destroy(err => {
+    if (err) return res.send("Logout failed");
+
+    res.clearCookie("roamly.sid");
+    res.redirect("/");
+  });
 });
+
 
 /* ---------- ADMIN ---------- */
 
@@ -208,9 +248,11 @@ app.get("/checkout/:bookingId", requireLogin, async (req, res) => {
     qty: booking.qty,
     subtotal,
     total,
-    razorpayKey: process.env.RAZORPAY_KEY_ID   // ✅ ADD THIS
+    razorpayKey: process.env.RAZORPAY_KEY_ID // ✅ PASS IT
   });
 });
+
+
 
 
 app.get("/my-bookings", requireLogin, async (req, res) => {

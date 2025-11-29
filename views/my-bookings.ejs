@@ -1,27 +1,95 @@
-<h1 class="text-2xl font-bold mb-6">My Bookings</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Bookings | Roamly</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
 
-<% bookings.forEach(b => { %>
-  <div class="bg-white p-4 mb-4 rounded shadow">
-    <h3 class="font-semibold"><%= b.experienceId.title %></h3>
-    <p class="text-sm text-gray-600">
-      <%= b.date %> • <%= b.time %> • Qty: <%= b.qty %>
-    </p>
+<body class="bg-gray-100 text-gray-900 min-h-screen">
 
-    <% if (b.status === "confirmed") { %>
-      <form method="POST" action="/booking/<%= b._id %>/cancel">
-        <button class="mt-3 text-red-600 font-semibold">Cancel</button>
-      </form>
-    <% } else { %>
-      <p class="text-red-500 mt-2">Cancelled</p>
-    <% } %>
+<!-- NAVBAR -->
+<nav class="bg-white border-b sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <h1 class="text-2xl font-extrabold">🌍 Roamly</h1>
+    <a href="/explore" class="text-sm font-semibold text-gray-600 hover:text-black">
+      ← Back to Explore
+    </a>
   </div>
-  <p class="text-sm text-gray-600">
-  Payment: 
-  <% if (b.paymentStatus === "paid") { %>
-    <span class="text-green-600 font-semibold">Paid</span>
-  <% } else { %>
-    <span class="text-orange-500">Pending</span>
-  <% } %>
-</p>
+</nav>
 
-<% }) %>
+<!-- PAGE HEADER -->
+<section class="max-w-7xl mx-auto px-6 py-8">
+  <h1 class="text-3xl font-extrabold mb-2">My Bookings</h1>
+  <p class="text-gray-600">All your upcoming and past experiences in one place</p>
+</section>
+
+<!-- BOOKINGS -->
+<section class="max-w-7xl mx-auto px-6 pb-12">
+
+  <% if (bookings.length === 0) { %>
+    <div class="bg-white rounded-xl shadow p-10 text-center">
+      <p class="text-lg text-gray-500 mb-4">You don’t have any bookings yet.</p>
+      <a
+        href="/explore"
+        class="inline-block bg-yellow-400 hover:bg-yellow-500 px-6 py-3 rounded-lg font-semibold">
+        Explore Experiences
+      </a>
+    </div>
+  <% } %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <% bookings.forEach(b => { %>
+      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+
+        <!-- IMAGE -->
+        <div class="relative">
+          <img
+            src="<%= b.experienceId.image %>"
+            alt="<%= b.experienceId.title %>"
+            class="w-full h-48 object-cover"
+          />
+
+          <span class="absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full text-sm font-bold">
+            Confirmed
+          </span>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p-5 space-y-3">
+
+          <h3 class="text-lg font-semibold">
+            <%= b.experienceId.title %>
+          </h3>
+
+          <div class="text-sm text-gray-600 space-y-1">
+            <p>📅 <strong>Date:</strong> <%= b.date %></p>
+            <p>⏰ <strong>Time:</strong> <%= b.time %></p>
+            <p>👥 <strong>Quantity:</strong> <%= b.qty %></p>
+            <p>📍 <strong>Location:</strong> <%= b.experienceId.location %></p>
+          </div>
+
+          <!-- ACTIONS -->
+          <% if (b.status === "confirmed") { %>
+            <form method="POST" action="/booking/<%= b._id %>/cancel">
+              <button
+                class="mt-4 w-full border border-red-500 text-red-600 py-2 rounded-lg font-semibold hover:bg-red-50 transition">
+                Cancel Booking
+              </button>
+            </form>
+          <% } else { %>
+            <p class="mt-4 text-red-500 font-semibold">
+              ❌ Booking Cancelled
+            </p>
+          <% } %>
+
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+</section>
+
+</body>
+</html>
