@@ -218,6 +218,7 @@
     fetch("/book", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", 
       body: JSON.stringify({
         experienceId,
         date: selectedDate,

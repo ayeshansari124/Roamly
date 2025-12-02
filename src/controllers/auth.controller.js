@@ -13,7 +13,7 @@ exports.register = async (req, res) => {
   const user = await User.create({ name, email, password });
 
   req.session.userId = user._id;
-  req.session.role = user.role;     // 🔥 store role
+  req.session.role = user.role;     
 
   res.redirect("/explore");
 };
@@ -31,14 +31,15 @@ exports.login = async (req, res) => {
     if (err) return res.send("Session error");
 
     req.session.userId = user._id;
-    req.session.role = user.role;   // 🔥 store role
+    req.session.role = user.role;   
     res.redirect("/explore");
   });
 };
 
 exports.logout = (req, res) => {
-  req.session.destroy(() => {
+  req.session.destroy(err => {
     res.clearCookie("roamly.sid");
     res.redirect("/");
   });
 };
+
