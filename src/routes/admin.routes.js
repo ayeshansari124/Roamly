@@ -2,8 +2,8 @@ const router = require("express").Router();
 const admin = require("../controllers/admin.controller");
 const { requireAdmin } = require("../middlewares/auth");
 
-router.get("/admin", requireAdmin, admin.addExperiencePage);
-router.get("/admin/dashboard", requireAdmin, admin.dashboard);
-router.post("/admin/trips", requireAdmin, admin.addExperience);
+router.get("/dashboard", requireAdmin, admin.adminBookingsPage);
+router.get("/add-experience", requireAdmin, admin.addExperiencePage);
+router.post("/add-experience", requireAdmin, admin.addExperience);
 
 module.exports = router;

@@ -1,10 +1,11 @@
 const Booking = require("../models/Booking");
 const Experience = require("../models/Experience");
 
-exports.dashboard = async (req, res) => {
+exports.adminBookingsPage = async (req, res) => {
   const bookings = await Booking.find()
-    .populate("experienceId")
-    .populate("userId");
+    .populate("userId", "email")
+    .populate("experienceId", "title")
+    .sort({ createdAt: -1 });
 
   res.render("admin-dashboard", { bookings });
 };

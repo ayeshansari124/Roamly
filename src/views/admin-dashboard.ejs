@@ -2,119 +2,275 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin – Add Experience</title>
+  <title>Admin Dashboard – Bookings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body class="bg-gray-100 p-10">
+<body class="bg-gray-100 min-h-screen">
 
-<h1 class="text-2xl font-bold mb-6">Admin – Add Experience</h1>
+<%- include("partials/navbar") %>
 
-<form action="/admin/trips" method="POST"
-  class="bg-white p-6 rounded-xl shadow space-y-4 max-w-2xl">
+<section class="max-w-6xl mx-auto px-4 py-6">
 
-  <input name="title" placeholder="Title" required class="input">
-  <input name="location" placeholder="Location" required class="input">
-  <input name="price" type="number" placeholder="Price" required class="input">
-  <input name="duration" placeholder="Duration" required class="input">
-  <input name="image" placeholder="Image URL" required class="input">
+  <!-- ✅ STICKY TOOLBAR -->
+  <div class="sticky top-16 z-30 bg-gray-100 pb-4">
 
-  <textarea name="description" placeholder="Description" class="input"></textarea>
-  <textarea name="highlights"
-    placeholder="Highlights (comma separated)"
-    class="input"></textarea>
+    <!-- HEADER -->
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
+      <div>
+        <h1 class="text-2xl font-bold">📊 Admin – All Bookings</h1>
+        <p class="text-sm text-gray-600">Monitor bookings & payments</p>
+      </div>
 
-  <!-- AVAILABILITY BUILDER -->
-  <div class="border rounded-lg p-4 bg-gray-50">
-    <h3 class="font-semibold mb-3">Availability</h3>
-
-    <div class="grid grid-cols-3 gap-2 mb-3">
-      <input type="date" id="date" class="input">
-      <input type="time" id="time" class="input">
-      <input type="number" id="slots" placeholder="Slots" class="input">
+      <!-- REVENUE -->
+      <div class="bg-white border rounded-lg px-4 py-2 text-sm font-semibold">
+        💰 Revenue:
+        ₹<span id="revenueTotal">0</span>
+      </div>
     </div>
 
-    <button type="button"
-      onclick="addSlot()"
-      class="bg-yellow-400 px-4 py-2 rounded font-semibold">
-      Add Slot
-    </button>
+    <!-- CONTROLS -->
+    <div class="flex flex-wrap gap-3 items-center">
 
-    <!-- PREVIEW -->
-    <div id="availabilityPreview" class="mt-4 space-y-2 text-sm"></div>
+      <!-- FILTERS -->
+      <div class="flex gap-2">
+        <button onclick="filterStatus('all')" class="filter-btn active">All</button>
+        <button onclick="filterStatus('paid')" class="filter-btn">Paid</button>
+        <button onclick="filterStatus('pending')" class="filter-btn">Pending</button>
+        <button onclick="filterStatus('cancelled')" class="filter-btn">Cancelled</button>
+      </div>
 
-    <!-- hidden input sent to server -->
-    <input type="hidden" name="availability" id="availabilityInput">
+      <!-- SEARCH -->
+      <input
+        id="searchInput"
+        oninput="applySearch()"
+        placeholder="Search email or experience..."
+        class="search-input"
+      />
+
+      <!-- EXPORT -->
+      <button onclick="exportCSV()" class="export-btn">
+        Export CSV
+      </button>
+
+    </div>
   </div>
 
+  <% if (bookings.length === 0) { %>
+    <div class="bg-white p-10 rounded-xl shadow text-center text-gray-500 mt-8">
+      No bookings found.
+    </div>
+  <% } %>
+
+  <!-- ✅ GRID -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mt-6">
+
+    <% bookings.forEach(b => { %>
+      <div
+  class="booking-card bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3"
+  data-payment="<%= b.paymentStatus %>"
+  data-status="<%= b.status %>"
+  data-email="<%= b.userId ? b.userId.email.toLowerCase() : '' %>"
+  data-title="<%= b.experienceId ? b.experienceId.title.toLowerCase() : '' %>"
+  data-qty="<%= b.qty %>"
+  data-date="<%= b.date %>"
+  data-time="<%= b.time %>"
+  data-created="<%= new Date(b.createdAt).toLocaleDateString() %>"
+  data-amount="<%= (b.paymentStatus === 'paid' && b.experienceId && b.experienceId.price) ? Number(b.experienceId.price) * Number(b.qty) : 0 %>"
+>
+
+
+        <!-- HEADER -->
+        <div class="flex justify-between gap-2">
+          <div class="min-w-0">
+            <h3 class="font-semibold text-sm truncate">
+              <%= b.experienceId ? b.experienceId.title : "Deleted Experience" %>
+            </h3>
+            <p class="text-xs text-gray-500 truncate">
+              👤 <%= b.userId ? b.userId.email : "Deleted User" %>
+            </p>
+          </div>
+
+          <span class="px-2 py-0.5 text-xs rounded-full font-semibold
+            <%= b.paymentStatus === "paid"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
+            %>">
+            <%= b.paymentStatus.toUpperCase() %>
+          </span>
+        </div>
+
+        <!-- META -->
+        <div class="grid grid-cols-2 gap-y-1 text-xs text-gray-600">
+          <span>📅 <%= b.date %></span>
+          <span>⏰ <%= b.time %></span>
+          <span>👥 Qty: <%= b.qty %></span>
+          <span>🕒 <%= new Date(b.createdAt).toLocaleDateString() %></span>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="mt-auto flex items-center justify-between">
+          <span class="px-2 py-0.5 text-xs rounded-full
+            <%= b.status === "confirmed"
+              ? "bg-blue-100 text-blue-700"
+              : "bg-red-100 text-red-600"
+            %>">
+            <%= b.status.toUpperCase() %>
+          </span>
+
+          <div class="flex gap-3 text-xs">
   <button
-    class="w-full bg-green-500 text-white py-3 rounded-lg font-bold">
-    Save Experience
+    onclick="alert('Detailed booking view coming soon')"
+    class="text-blue-600 hover:underline"
+  >
+    View
   </button>
 
-</form>
+  <button
+    disabled
+    title="Cancellation flow not implemented yet"
+    class="text-gray-400 cursor-not-allowed"
+  >
+    Cancel
+  </button>
+</div>
+
+        </div>
+
+      </div>
+    <% }) %>
+
+  </div>
+
+</section>
 
 <style>
-  .input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
+  .filter-btn {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .filter-btn.active {
+    background: #111827;
+    color: white;
+    border-color: #111827;
+  }
+  .search-input {
+    padding: 7px 12px;
     border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 13px;
+    min-width: 220px;
+  }
+  .export-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: #16a34a;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
   }
 </style>
 
 <script>
-  const availability = {};
+  function calculateRevenue() {
+  let total = 0;
 
-  function addSlot() {
-    const date = document.getElementById("date").value;
-    const time = document.getElementById("time").value;
-    const slots = parseInt(document.getElementById("slots").value);
-
-    if (!date || !time || !slots) {
-      alert("Fill date, time and slots");
-      return;
+  document.querySelectorAll(".booking-card").forEach(card => {
+    if (card.style.display !== "none") {
+      const amount = Number(card.dataset.amount);
+      if (!isNaN(amount)) total += amount;
     }
+  });
 
-    if (!availability[date]) {
-      availability[date] = [];
+  document.getElementById("revenueTotal").innerText = total;
+}
+
+
+ let activeFilter = "all";
+
+function filterStatus(type) {
+  activeFilter = type;
+
+  document.querySelectorAll(".filter-btn").forEach(b =>
+    b.classList.remove("active")
+  );
+  event.target.classList.add("active");
+
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById("searchInput").value.toLowerCase();
+
+  document.querySelectorAll(".booking-card").forEach(card => {
+    const pay = card.dataset.payment;
+    const status = card.dataset.status;
+
+    const filterMatch =
+      activeFilter === "all" ||
+      (activeFilter === "paid" && pay === "paid") ||
+      (activeFilter === "pending" && pay === "pending") ||
+      (activeFilter === "cancelled" && status === "cancelled");
+
+    const searchMatch =
+      card.dataset.email.includes(q) ||
+      card.dataset.title.includes(q);
+
+    card.style.display = filterMatch && searchMatch ? "flex" : "none";
+  });
+
+  calculateRevenue();
+}
+
+function applySearch() {
+  const q = document.getElementById("searchInput").value.toLowerCase();
+
+  document.querySelectorAll(".booking-card").forEach(card => {
+    const email = card.dataset.email;
+    const title = card.dataset.title;
+    const matches = email.includes(q) || title.includes(q);
+
+    card.style.display = matches ? "flex" : "none";
+  });
+
+  calculateRevenue();
+}
+
+ function exportCSV() {
+  const rows = [
+    ["Experience", "Email", "Date", "Time", "Qty", "Payment", "Status", "Amount"]
+  ];
+
+  document.querySelectorAll(".booking-card").forEach(card => {
+    if (card.style.display !== "none") {
+      rows.push([
+        card.dataset.title,
+        card.dataset.email,
+        card.dataset.date,
+        card.dataset.time,
+        card.dataset.qty,
+        card.dataset.payment,
+        card.dataset.status,
+        card.dataset.amount
+      ]);
     }
+  });
 
-    availability[date].push({
-      time: formatTime(time),
-      slots
-    });
+  const csv = rows.map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
 
-    renderPreview();
-    document.getElementById("availabilityInput").value =
-      JSON.stringify(availability);
+  a.href = URL.createObjectURL(blob);
+  a.download = "bookings.csv";
+  a.click();
+}
 
-    // reset
-    document.getElementById("time").value = "";
-    document.getElementById("slots").value = "";
-  }
-
-  function formatTime(t) {
-    const [h, m] = t.split(":");
-    const hour = +h % 12 || 12;
-    const ampm = h >= 12 ? "PM" : "AM";
-    return `${hour}:${m} ${ampm}`;
-  }
-
-  function renderPreview() {
-    const div = document.getElementById("availabilityPreview");
-    div.innerHTML = "";
-
-    for (const date in availability) {
-      const section = document.createElement("div");
-      section.innerHTML = `<strong>${date}</strong>: ` +
-        availability[date]
-          .map(s => `${s.time} (${s.slots})`)
-          .join(", ");
-
-      div.appendChild(section);
-    }
-  }
+  calculateRevenue();
 </script>
 
 </body>
