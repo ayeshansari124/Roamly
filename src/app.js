@@ -66,6 +66,19 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 /* =========================
+   ATTACH USER FROM SESSION
+========================= */
+app.use((req, res, next) => {
+  if (req.session.userId) {
+    req.user = {
+      _id: req.session.userId,
+      role: req.session.role
+    };
+  }
+  next();
+});
+
+/* =========================
    ROUTES (AFTER SESSION)
 ========================= */
 app.use("/", authRoutes);

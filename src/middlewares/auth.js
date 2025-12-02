@@ -16,19 +16,12 @@ exports.requireLoginApi = (req, res, next) => {
   next();
 };
 
-exports.requireAdmin = async (req, res, next) => {
-  if (!req.session.userId) return res.redirect("/");
-
-  const user = await User.findById(req.session.userId);
-  if (!user || user.role !== "admin") {
-    return res.send("Access denied");
+exports.requireAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).render("error", {
+      statusCode: 403,
+      message: "Access denied"
+    });
   }
-
   next();
 };
-
-// res.render("any-view", {
-//   isAuthenticated: !!req.user,
-//   userRole: req.user?.role || "user"
-// });
-

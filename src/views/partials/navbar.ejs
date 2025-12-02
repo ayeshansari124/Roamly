@@ -15,27 +15,22 @@
         </a>
 
         <% if (userRole === "admin") { %>
-  <a href="/admin/dashboard" class="text-gray-600 hover:text-black">
-    Admin Dashboard
-  </a>
-
-  <a href="/admin/add-experience" class="text-gray-600 hover:text-black">
-    Add Experience
-  </a>
-<% } %>
-
+          <a href="/admin/dashboard" class="text-gray-600 hover:text-black">
+            Admin Dashboard
+          </a>
+        <% } %>
 
         <form action="/logout" method="POST">
           <button class="text-red-500 hover:text-red-700">
             Logout
           </button>
         </form>
+
       <% } else { %>
         <a href="/" class="text-gray-600 hover:text-black">Login</a>
         <a href="/" class="text-yellow-500 hover:text-yellow-600">Sign Up</a>
       <% } %>
 
     </div>
-
   </div>
 </nav>

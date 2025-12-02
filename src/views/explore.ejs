@@ -3,127 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <title>Explore Experiences | Roamly</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body class="bg-gray-100 text-gray-900 min-h-screen">
 
-<!-- NAVBAR -->
-<nav class="bg-white border-b sticky top-0 z-40">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <h1 class="text-2xl font-extrabold">🌍 Roamly</h1>
+  <!-- ✅ ONLY PLACE WITH DISTINCT BACKGROUND -->
+  <%- include("partials/navbar") %>
 
-    <a href="/" class="text-sm font-semibold text-gray-600 hover:text-black">
-      ← Back to Home
-    </a>
-  </div>
-</nav>
+  <!-- ================= HEADER + SEARCH + ADMIN ACTION ================= -->
+  <section class="max-w-7xl mx-auto px-6 pt-8">
 
-<!-- SEARCH + FILTERS -->
-<section class="max-w-7xl mx-auto px-6 py-6">
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-    <!-- Search -->
-    <form method="GET" action="/explore" class="flex w-full sm:max-w-md">
-  <input
-    type="text"
-    name="q"
-    value="<%= query || '' %>"
-    placeholder="Search experiences or destinations"
-    class="w-full px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-yellow-400 outline-none"
-  />
-  <button
-    type="submit"
-    class="bg-yellow-400 px-5 rounded-r-lg font-semibold hover:bg-yellow-500"
-  >
-    Search
-  </button>
-</form>
+      <!-- LEFT: TITLE + SEARCH -->
+      <div class="flex flex-col gap-3 w-full sm:max-w-xl">
+        <h1 class="text-2xl font-bold">
+          Explore Experiences
+        </h1>
 
+        <form method="GET" action="/explore" class="flex">
+          <input
+            type="text"
+            name="q"
+            value="<%= query || '' %>"
+            placeholder="Search experiences or destinations"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-l-lg
+                   focus:ring-2 focus:ring-yellow-400 outline-none"
+          />
+          <button
+            type="submit"
+            class="bg-yellow-400 px-5 rounded-r-lg font-semibold hover:bg-yellow-500"
+          >
+            Search
+          </button>
+        </form>
+      </div>
 
-    <!-- Filters -->
-    <div class="flex gap-3 overflow-x-auto">
-      <button class="filter-btn">Location</button>
-      <button class="filter-btn">Price</button>
-      <button class="filter-btn">Duration</button>
-      <button class="filter-btn">Adventure</button>
+      <!-- RIGHT: ADMIN ONLY ACTION -->
+      <% if (userRole === "admin") { %>
+        <a
+          href="/admin/add-experience"
+          class="bg-yellow-400 hover:bg-yellow-500
+                 text-black font-bold px-5 py-2.5 rounded-lg shadow-sm"
+        >
+          + Add Experience
+        </a>
+      <% } %>
+
     </div>
+  </section>
 
-  </div>
-</section>
-
-<!-- EXPERIENCES GRID -->
-<section class="max-w-7xl mx-auto px-6 pb-12">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  <!-- ================= EXPERIENCES GRID ================= -->
+  <section class="max-w-7xl mx-auto px-6 pb-12 mt-8">
 
     <% if (experiences.length === 0) { %>
-  <div class="col-span-full text-center text-gray-500 text-lg mt-10">
-    No experiences found for "<strong><%= query %></strong>"
+      <div class="text-center text-gray-500 text-lg mt-16">
+        No experiences found
+        <% if (query) { %>
+          for "<strong><%= query %></strong>"
+        <% } %>
+      </div>
+    <% } %>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+      <% experiences.forEach(exp => { %>
+        <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
+
+          <!-- IMAGE -->
+          <div class="relative">
+            <img
+              src="<%= exp.image %>"
+              alt="<%= exp.title %>"
+              class="w-full h-44 object-cover"
+            />
+            <span
+              class="absolute top-3 right-3 bg-white
+                     text-sm font-bold px-3 py-1 rounded-full shadow"
+            >
+              ₹<%= exp.price %>
+            </span>
+          </div>
+
+          <!-- CONTENT -->
+          <div class="p-4 space-y-2">
+
+            <div class="flex items-start justify-between">
+              <h3 class="font-semibold text-base leading-snug">
+                <%= exp.title %>
+              </h3>
+              <span class="text-xs bg-gray-200 px-2 py-1 rounded-md">
+                <%= exp.location %>
+              </span>
+            </div>
+
+            <p class="text-sm text-gray-600 line-clamp-2">
+              <%= exp.description %>
+            </p>
+
+            <div class="flex items-center justify-between pt-2">
+              <span class="text-xs font-medium text-gray-500">
+                ⏱ <%= exp.duration %>
+              </span>
+
+              <a
+                href="/experience/<%= exp._id %>"
+                class="text-yellow-500 font-semibold text-sm hover:underline"
+              >
+                View details →
+              </a>
+            </div>
+
+            <!-- ADMIN ACTIONS INSIDE CARD -->
+<% if (userRole === "admin") { %>
+  <div class="border-t mt-3 pt-3 flex justify-between text-sm">
+
+    <a
+      href="/admin/edit-experience/<%= exp._id %>"
+      class="text-blue-600 font-semibold hover:underline"
+    >
+      Edit
+    </a>
+
+    <form
+      method="POST"
+      action="/admin/delete-experience/<%= exp._id %>"
+      onsubmit="return confirm('Are you sure you want to delete this experience?');"
+    >
+      <button
+        type="submit"
+        class="text-red-600 font-semibold hover:underline"
+      >
+        Delete
+      </button>
+    </form>
+
   </div>
 <% } %>
 
-
-    <% experiences.forEach(exp => { %>
-      <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
-
-        <!-- Image -->
-        <div class="relative">
-          <img
-            src="<%= exp.image %>"
-            alt="<%= exp.title %>"
-            class="w-full h-44 object-cover"
-          />
-
-          <span class="absolute top-3 right-3 bg-white/90 text-sm font-bold px-3 py-1 rounded-full">
-            ₹<%= exp.price %>
-          </span>
-        </div>
-
-        <!-- Content -->
-        <div class="p-4 flex flex-col gap-2">
-
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-lg leading-tight">
-              <%= exp.title %>
-            </h3>
-            <span class="text-xs bg-gray-200 px-2 py-1 rounded-md">
-              <%= exp.location %>
-            </span>
           </div>
-
-          <p class="text-sm text-gray-600">
-            <%= exp.description %>
-          </p>
-
-          <div class="flex items-center justify-between mt-3">
-            <span class="text-sm font-medium text-gray-500">
-              ⏱ <%= exp.duration %>
-            </span>
-
-            <a
-  href="/experience/<%= exp._id %>"
-  class="inline-block mt-3 text-yellow-500 font-semibold"
->
-  View details →
-</a>
-
-
-          </div>
-
         </div>
-      </div>
-    <% }) %>
+      <% }) %>
 
-  </div>
-</section>
-
-<!-- Tailwind helper -->
-<style>
-  .filter-btn {
-    @apply px-4 py-2 text-sm font-semibold border border-gray-300 rounded-full bg-white hover:bg-gray-100 whitespace-nowrap;
-  }
-</style>
+    </div>
+  </section>
 
 </body>
 </html>
