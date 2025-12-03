@@ -1,27 +1,21 @@
-const User = require("../models/User");
+const deny = (req, res, next, status, message, redirect = false) =>
+  redirect
+    ? res.status(status).redirect("/")
+    : res.status(status).json({ error: message });
 
-// Page-based auth
-exports.requireLogin = (req, res, next) => {
-  if (!req.session.userId) {
-    return res.redirect("/");
-  }
-  next();
-};
+exports.requireLogin = (req, res, next) =>
+  req.session.userId
+    ? next()
+    : deny(req, res, next, 401, "Not authenticated", true);
 
-// API-based auth (JSON response)
-exports.requireLoginApi = (req, res, next) => {
-  if (!req.session.userId) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-  next();
-};
+exports.requireLoginApi = (req, res, next) =>
+  req.session.userId
+    ? next()
+    : deny(req, res, next, 401, "Not authenticated");
 
-exports.requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== "admin") {
-    return res.status(403).render("error", {
-      statusCode: 403,
-      message: "Access denied"
-    });
-  }
-  next();
-};
+exports.requireAdmin = (req, res, next) =>
+  req.user?.role === "admin"
+    ? next()
+    : res
+        .status(403)
+        .render("error", { statusCode: 403, message: "Access denied" });

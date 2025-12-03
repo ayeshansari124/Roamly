@@ -1,155 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Checkout | Roamly</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<section
+  class="max-w-4xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8"
+  data-booking-id="<%= bookingId %>"
+  data-razorpay-key="<%= razorpayKey %>"
+  data-title="<%= experience.title %>"
+  data-amount="<%= total %>"
+>
 
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-</head>
+  <!-- LEFT -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h2 class="text-lg font-bold mb-4">Checkout</h2>
 
-<body class="bg-gray-100 min-h-screen">
+    <form class="space-y-4">
+  <input
+    id="fullName"
+    type="text"
+    placeholder="Full name"
+    required
+    class="w-full p-3 border rounded-lg"
+  />
 
-  <%- include("partials/navbar") %>
+  <input
+    id="email"
+    type="email"
+    placeholder="Email"
+    required
+    class="w-full p-3 border rounded-lg"
+  />
+</form>
 
-  <section class="max-w-4xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="bg-white p-6 rounded-xl shadow md:col-span-2">
+  <div class="flex items-start gap-2 text-sm text-gray-600">
+    <input
+      type="checkbox"
+      id="agreeTerms"
+      class="mt-1"
+    />
+    <label for="agreeTerms">
+      I agree to the
+      <span class="underline cursor-pointer">Terms & Services</span>
+      and
+      <span class="underline cursor-pointer">Privacy Policy</span>
+    </label>
+  </div>
+</div>
 
-    <!-- LEFT -->
-    <div class="bg-white p-6 rounded-xl shadow">
-      <h2 class="text-lg font-bold mb-4">Checkout</h2>
+  </div>
 
-      <form class="space-y-4">
-        <input placeholder="Full name" required class="w-full p-3 border rounded-lg">
-        <input type="email" placeholder="Email" required class="w-full p-3 border rounded-lg">
-        <input placeholder="Promo code" class="w-full p-3 border rounded-lg">
-      </form>
-    </div>
+  <!-- RIGHT -->
+  <div class="bg-white p-6 rounded-xl shadow">
 
-    <!-- RIGHT -->
-    <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="font-semibold mb-4">Booking Summary</h3>
 
-      <h3 class="font-semibold mb-4">Booking Summary</h3>
-
-      <div class="text-sm text-gray-600 space-y-2">
-        <div class="flex justify-between">
-          <span>Experience</span>
-          <span><%= experience.title %></span>
-        </div>
-
-        <div class="flex justify-between">
-          <span>Date</span>
-          <span><%= date %></span>
-        </div>
-
-        <div class="flex justify-between">
-          <span>Time</span>
-          <span><%= time %></span>
-        </div>
-
-        <div class="flex justify-between">
-          <span>Qty</span>
-          <span><%= qty %></span>
-        </div>
-
-        <hr>
-
-        <div class="flex justify-between">
-          <span>Subtotal</span>
-          <span>₹<%= subtotal %></span>
-        </div>
-
-        <div class="flex justify-between font-bold text-lg">
-          <span>Total</span>
-          <span>₹<%= total %></span>
-        </div>
+    <div class="text-sm text-gray-600 space-y-2">
+      <div class="flex justify-between">
+        <span>Experience</span>
+        <span><%= experience.title %></span>
       </div>
+      <div class="flex justify-between"><span>Date</span><span><%= date %></span></div>
+      <div class="flex justify-between"><span>Time</span><span><%= time %></span></div>
+      <div class="flex justify-between"><span>Qty</span><span><%= qty %></span></div>
 
-      <button
-        id="payBtn"
-        class="w-full mt-6 bg-yellow-400 py-4 rounded-lg font-bold">
-        Pay and Confirm
-      </button>
+      <hr>
 
-      <form method="POST" action="/booking/<%= bookingId %>/cancel" class="mt-4">
-        <button
-          class="w-full bg-red-100 text-red-600 py-3 rounded-lg font-semibold hover:bg-red-200">
-          Cancel Booking
-        </button>
-      </form>
-
+      <div class="flex justify-between"><span>Subtotal</span><span>₹<%= subtotal %></span></div>
+      <div class="flex justify-between font-bold text-lg"><span>Total</span><span>₹<%= total %></span></div>
     </div>
-  </section>
+<button
+  id="payBtn"
+  disabled
+  class="w-full mt-4 bg-gray-300 text-gray-500 py-4 rounded-lg font-bold cursor-not-allowed"
+>
+  Pay and Confirm
+</button>
 
-  <script>
-    const bookingId = "<%= bookingId %>";
-    const razorpayKey = "<%= razorpayKey %>";
+    <form method="POST" action="/booking/<%= bookingId %>/cancel" class="mt-4">
+      <button class="w-full bg-red-100 text-red-600 py-3 rounded-lg font-semibold hover:bg-red-200">
+        Cancel Booking
+      </button>
+    </form>
 
-    document.getElementById("payBtn").onclick = async () => {
-      try {
-        const res = await fetch("/payment/create-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ bookingId })
-        });
+  </div>
+</section>
 
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          if (res.status === 401) {
-            alert("You are logged out. Please login again.");
-            window.location.href = "/";
-            return;
-          }
-          alert(err.error || "Failed to create payment order");
-          return;
-        }
-
-        const data = await res.json();
-        if (!data.orderId) {
-          console.error("No orderId in response", data);
-          alert("Payment setup failed");
-          return;
-        }
-
-        const rzp = new Razorpay({
-          key: razorpayKey,
-          amount: data.amount * 100,
-          currency: "INR",
-          name: "Roamly",
-          description: "<%= experience.title %>",
-          order_id: data.orderId,
-          handler: async function (response) {
-            try {
-              const verifyRes = await fetch("/payment/verify", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ bookingId })
-              });
-
-              const verifyData = await verifyRes.json().catch(() => ({}));
-
-              if (!verifyRes.ok || !verifyData.success) {
-                alert(verifyData.error || "Payment verification failed");
-                return;
-              }
-
-              window.location.href = "/my-bookings";
-            } catch (err) {
-              console.error("Verify error:", err);
-              alert("Payment verification error");
-            }
-          }
-        });
-
-        rzp.open();
-      } catch (err) {
-        console.error("Pay button error:", err);
-        alert("Unexpected error starting payment");
-      }
-    };
-  </script>
-
-</body>
-</html>
+<script defer src="/checkout.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>

@@ -1,133 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title><%= isEdit ? "Edit Experience" : "Add Experience" %> | Roamly</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-
-<body class="bg-gray-100 min-h-screen">
-
-<%- include("partials/navbar") %>
-
 <section class="max-w-6xl mx-auto px-6 py-10">
 
   <h1 class="text-3xl font-bold mb-8">
     <%= isEdit ? "Edit Experience" : "Add Experience" %>
   </h1>
 
- <form
-  method="POST"
-  action="<%= isEdit ? `/admin/edit-experience/${experience._id}` : '/admin/add-experience' %>"
-  class="bg-white p-8 rounded-2xl shadow space-y-8"
->
-
-  <!-- ROW 1: TITLE / LOCATION / PRICE / DURATION / IMAGE -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-    <input name="title" value="<%= experience?.title || '' %>" placeholder="Title" required class="input" />
-    <input name="location" value="<%= experience?.location || '' %>" placeholder="Location" required class="input" />
-    <input name="price" type="number" value="<%= experience?.price || '' %>" placeholder="₹ Price" required class="input" />
-    <input name="duration" value="<%= experience?.duration || '' %>" placeholder="Duration" required class="input" />
-    <input name="image" value="<%= experience?.image || '' %>" placeholder="Image URL" required class="input" />
-  </div>
-
-  <!-- ROW 2: DESCRIPTION / HIGHLIGHTS -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <textarea
-      name="description"
-      placeholder="Experience description"
-      class="input h-32"
-    ><%= experience?.description || '' %></textarea>
-
-    <textarea
-      name="highlights"
-      placeholder="Highlights (comma separated)"
-      class="input h-32"
-    ><%= experience?.highlights?.join(", ") || '' %></textarea>
-  </div>
-
-  <!-- ROW 3: SLOTS -->
-  <div>
-    <h2 class="text-xl font-semibold mb-3">Available Slots</h2>
-
-    <div id="slotsContainer" class="space-y-3"></div>
-
-    <button
-      type="button"
-      onclick="addSlot()"
-      class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold"
-    >
-      + Add Slot
-    </button>
-  </div>
-
-  <!-- HIDDEN AVAILABILITY -->
-  <input type="hidden" name="availability" id="availabilityInput" />
-
-  <!-- ROW 4: SUBMIT -->
-  <button
-    class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl text-lg font-bold"
+  <form
+    method="POST"
+    action="<%= isEdit ? `/admin/edit-experience/${experience._id}` : '/admin/add-experience' %>"
+    class="bg-white p-8 rounded-2xl shadow space-y-8"
   >
-    <%= isEdit ? "Update Experience" : "Create Experience" %>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <input name="title" value="<%= experience?.title || '' %>" required class="input" placeholder="Title">
+      <input name="location" value="<%= experience?.location || '' %>" required class="input" placeholder="Location">
+      <input name="price" type="number" value="<%= experience?.price || '' %>" required class="input" placeholder="₹ Price">
+      <input name="duration" value="<%= experience?.duration || '' %>" required class="input" placeholder="Duration">
+      <input name="image" value="<%= experience?.image || '' %>" required class="input" placeholder="Image URL">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <textarea name="description" class="input h-32" placeholder="Description"><%= experience?.description || '' %></textarea>
+      <textarea name="highlights" class="input h-32" placeholder="Highlights"><%= experience?.highlights?.join(", ") || '' %></textarea>
+    </div>
+<div>
+  <h2 class="text-xl font-semibold mb-3">Available Slots</h2>
+  <div id="slotsContainer" class="space-y-3"></div>
+
+  <button
+    type="button"
+    id="addSlotBtn"
+    class="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold">
+    + Add Slot
   </button>
+</div>
 
-</form>
+<input type="hidden" name="availability" id="availabilityInput">
 
+    <button class="w-full bg-green-500 text-white py-3 rounded-xl text-lg font-bold">
+      <%= isEdit ? "Update Experience" : "Create Experience" %>
+    </button>
+
+  </form>
 </section>
-
-<style>
-  .input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    background: #f9fafb;
-  }
-</style>
-
-<script>
-  const slotsContainer = document.getElementById("slotsContainer");
-  const availabilityInput = document.getElementById("availabilityInput");
-
-  let slots = <%- JSON.stringify(experience?.availability?.slots || []) %>;
-
-  function renderSlots() {
-    slotsContainer.innerHTML = "";
-
-    slots.forEach((slot, index) => {
-      slotsContainer.innerHTML += `
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-gray-100 p-3 rounded-lg">
-          <input type="date" value="${slot.date || ""}" onchange="updateSlot(${index}, 'date', this.value)" class="input">
-          <input type="time" value="${slot.start || ""}" onchange="updateSlot(${index}, 'start', this.value)" class="input">
-          <input type="time" value="${slot.end || ""}" onchange="updateSlot(${index}, 'end', this.value)" class="input">
-          <button type="button" onclick="removeSlot(${index})" class="bg-red-500 text-white rounded-lg font-bold">
-            ✕
-          </button>
-        </div>
-      `;
-    });
-
-    availabilityInput.value = JSON.stringify({ slots });
-  }
-
-  function addSlot() {
-    slots.push({ date: "", start: "", end: "" });
-    renderSlots();
-  }
-
-  function updateSlot(index, field, value) {
-    slots[index][field] = value;
-    availabilityInput.value = JSON.stringify({ slots });
-  }
-
-  function removeSlot(index) {
-    slots.splice(index, 1);
-    renderSlots();
-  }
-
-  renderSlots();
-</script>
-
-</body>
-</html>
+<link rel="stylesheet" href="/admin.css">
+<script defer src="/admin-form.js"></script>

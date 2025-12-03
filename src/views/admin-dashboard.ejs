@@ -1,101 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard – Bookings</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-</head>
-
-<body class="bg-gray-100 min-h-screen">
-
-<%- include("partials/navbar") %>
-
 <section class="max-w-6xl mx-auto px-4 py-6">
 
-  <!-- ✅ STICKY TOOLBAR -->
   <div class="sticky top-16 z-30 bg-gray-100 pb-4">
-
-    <!-- HEADER -->
     <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
       <div>
         <h1 class="text-2xl font-bold">📊 Admin – All Bookings</h1>
         <p class="text-sm text-gray-600">Monitor bookings & payments</p>
       </div>
 
-      <!-- REVENUE -->
       <div class="bg-white border rounded-lg px-4 py-2 text-sm font-semibold">
-        💰 Revenue:
-        ₹<span id="revenueTotal">0</span>
+        💰 Revenue: ₹<span id="revenueTotal">0</span>
       </div>
     </div>
 
-    <!-- CONTROLS -->
     <div class="flex flex-wrap gap-3 items-center">
-
-      <!-- FILTERS -->
       <div class="flex gap-2">
-        <button onclick="filterStatus('all')" class="filter-btn active">All</button>
-        <button onclick="filterStatus('paid')" class="filter-btn">Paid</button>
-        <button onclick="filterStatus('pending')" class="filter-btn">Pending</button>
-        <button onclick="filterStatus('cancelled')" class="filter-btn">Cancelled</button>
+        <button data-filter="all" class="filter-btn active">All</button>
+        <button data-filter="paid" class="filter-btn">Paid</button>
+        <button data-filter="pending" class="filter-btn">Pending</button>
+        <button data-filter="cancelled" class="filter-btn">Cancelled</button>
       </div>
 
-      <!-- SEARCH -->
       <input
         id="searchInput"
-        oninput="applySearch()"
         placeholder="Search email or experience..."
         class="search-input"
       />
 
-      <!-- EXPORT -->
-      <button onclick="exportCSV()" class="export-btn">
-        Export CSV
-      </button>
-
+      <button id="exportBtn" class="export-btn">Export CSV</button>
     </div>
   </div>
 
-  <% if (bookings.length === 0) { %>
-    <div class="bg-white p-10 rounded-xl shadow text-center text-gray-500 mt-8">
-      No bookings found.
-    </div>
-  <% } %>
-
-  <!-- ✅ GRID -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mt-6">
-
     <% bookings.forEach(b => { %>
       <div
-  class="booking-card bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3"
-  data-payment="<%= b.paymentStatus %>"
-  data-status="<%= b.status %>"
-  data-email="<%= b.userId ? b.userId.email.toLowerCase() : '' %>"
-  data-title="<%= b.experienceId ? b.experienceId.title.toLowerCase() : '' %>"
-  data-qty="<%= b.qty %>"
-  data-date="<%= b.date %>"
-  data-time="<%= b.time %>"
-  data-created="<%= new Date(b.createdAt).toLocaleDateString() %>"
-  data-amount="<%= (b.paymentStatus === 'paid' && b.experienceId && b.experienceId.price) ? Number(b.experienceId.price) * Number(b.qty) : 0 %>"
->
-
+        class="booking-card bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3"
+        data-payment="<%= b.paymentStatus %>"
+        data-status="<%= b.status %>"
+        data-email="<%= b.userId?.email?.toLowerCase() || "" %>"
+        data-title="<%= b.experienceId?.title?.toLowerCase() || "" %>"
+        data-date="<%= b.date %>"
+        data-time="<%= b.time %>"
+        data-qty="<%= b.qty %>"
+        data-created="<%= new Date(b.createdAt).toLocaleDateString() %>"
+        data-amount="<%= b.paymentStatus === 'paid' ? Number(b.amountPaid || 0) : 0 %>"
+      >
 
         <!-- HEADER -->
         <div class="flex justify-between gap-2">
           <div class="min-w-0">
             <h3 class="font-semibold text-sm truncate">
-              <%= b.experienceId ? b.experienceId.title : "Deleted Experience" %>
+              <%= b.experienceId?.title || "Deleted Experience" %>
             </h3>
             <p class="text-xs text-gray-500 truncate">
-              👤 <%= b.userId ? b.userId.email : "Deleted User" %>
+              👤 <%= b.userId?.email || "Deleted User" %>
             </p>
           </div>
 
           <span class="px-2 py-0.5 text-xs rounded-full font-semibold
-            <%= b.paymentStatus === "paid"
-              ? "bg-green-100 text-green-700"
-              : "bg-yellow-100 text-yellow-700"
+            <%= b.paymentStatus === 'paid'
+              ? 'bg-green-100 text-green-700'
+              : 'bg-yellow-100 text-yellow-700'
             %>">
             <%= b.paymentStatus.toUpperCase() %>
           </span>
@@ -112,166 +76,23 @@
         <!-- FOOTER -->
         <div class="mt-auto flex items-center justify-between">
           <span class="px-2 py-0.5 text-xs rounded-full
-            <%= b.status === "confirmed"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-red-100 text-red-600"
+            <%= b.status === 'confirmed'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-red-100 text-red-600'
             %>">
             <%= b.status.toUpperCase() %>
           </span>
 
-          <div class="flex gap-3 text-xs">
-  <button
-    onclick="alert('Detailed booking view coming soon')"
-    class="text-blue-600 hover:underline"
-  >
-    View
-  </button>
-
-  <button
-    disabled
-    title="Cancellation flow not implemented yet"
-    class="text-gray-400 cursor-not-allowed"
-  >
-    Cancel
-  </button>
-</div>
-
+          <span class="text-xs font-semibold text-gray-700">
+            ₹ <%= b.paymentStatus === 'paid' ? Number(b.amountPaid || 0) : 0 %>
+          </span>
         </div>
 
       </div>
     <% }) %>
-
   </div>
 
 </section>
 
-<style>
-  .filter-btn {
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: white;
-    font-size: 13px;
-    font-weight: 600;
-  }
-  .filter-btn.active {
-    background: #111827;
-    color: white;
-    border-color: #111827;
-  }
-  .search-input {
-    padding: 7px 12px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    font-size: 13px;
-    min-width: 220px;
-  }
-  .export-btn {
-    padding: 7px 14px;
-    border-radius: 8px;
-    background: #16a34a;
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-  }
-</style>
-
-<script>
-  function calculateRevenue() {
-  let total = 0;
-
-  document.querySelectorAll(".booking-card").forEach(card => {
-    if (card.style.display !== "none") {
-      const amount = Number(card.dataset.amount);
-      if (!isNaN(amount)) total += amount;
-    }
-  });
-
-  document.getElementById("revenueTotal").innerText = total;
-}
-
-
- let activeFilter = "all";
-
-function filterStatus(type) {
-  activeFilter = type;
-
-  document.querySelectorAll(".filter-btn").forEach(b =>
-    b.classList.remove("active")
-  );
-  event.target.classList.add("active");
-
-  applyFilters();
-}
-
-function applyFilters() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-
-  document.querySelectorAll(".booking-card").forEach(card => {
-    const pay = card.dataset.payment;
-    const status = card.dataset.status;
-
-    const filterMatch =
-      activeFilter === "all" ||
-      (activeFilter === "paid" && pay === "paid") ||
-      (activeFilter === "pending" && pay === "pending") ||
-      (activeFilter === "cancelled" && status === "cancelled");
-
-    const searchMatch =
-      card.dataset.email.includes(q) ||
-      card.dataset.title.includes(q);
-
-    card.style.display = filterMatch && searchMatch ? "flex" : "none";
-  });
-
-  calculateRevenue();
-}
-
-function applySearch() {
-  const q = document.getElementById("searchInput").value.toLowerCase();
-
-  document.querySelectorAll(".booking-card").forEach(card => {
-    const email = card.dataset.email;
-    const title = card.dataset.title;
-    const matches = email.includes(q) || title.includes(q);
-
-    card.style.display = matches ? "flex" : "none";
-  });
-
-  calculateRevenue();
-}
-
- function exportCSV() {
-  const rows = [
-    ["Experience", "Email", "Date", "Time", "Qty", "Payment", "Status", "Amount"]
-  ];
-
-  document.querySelectorAll(".booking-card").forEach(card => {
-    if (card.style.display !== "none") {
-      rows.push([
-        card.dataset.title,
-        card.dataset.email,
-        card.dataset.date,
-        card.dataset.time,
-        card.dataset.qty,
-        card.dataset.payment,
-        card.dataset.status,
-        card.dataset.amount
-      ]);
-    }
-  });
-
-  const csv = rows.map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
-
-  a.href = URL.createObjectURL(blob);
-  a.download = "bookings.csv";
-  a.click();
-}
-
-  calculateRevenue();
-</script>
-
-</body>
-</html>
+<link rel="stylesheet" href="/admin.css">
+<script defer src="/admin-dashboard.js"></script>

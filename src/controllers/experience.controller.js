@@ -2,25 +2,44 @@ const Experience = require("../models/Experience");
 
 exports.explore = async (req, res) => {
   const q = (req.query.q || "").toLowerCase();
-  let experiences = await Experience.find().lean();
 
-  if (q) {
-    experiences = experiences.filter(exp =>
-      exp.title.toLowerCase().includes(q) ||
-      exp.location.toLowerCase().includes(q)
-    );
-  }
+  const experiences = q
+    ? await Experience.find({
+        $or: [
+          { title: new RegExp(q, "i") },
+          { location: new RegExp(q, "i") }
+        ]
+      }).lean()
+    : await Experience.find().lean();
 
-  res.render("explore", { experiences, query: q });
+  res.render("explore", { title: "Explore", experiences, query: q });
 };
 
 exports.viewExperience = async (req, res) => {
-  const experience = await Experience.findById(req.params.id).lean();
-  if (!experience) return res.status(404).send("Not found");
+  const exp = await Experience.findById(req.params.id);
+  if (!exp) {
+    return res.status(404).render("error", {
+      title: "Not Found",
+      statusCode: 404,
+      message: "Experience not found"
+    });
+  }
 
-  experience.availability = Object.fromEntries(
-    Object.entries(experience.availability)
-  );
+  // ✅ normalize availability (Map → Object)
+  let availability = {};
+  if (exp.availability instanceof Map) {
+    availability = Object.fromEntries(exp.availability);
+  } else {
+    availability = exp.availability || {};
+  }
 
-  res.render("experience", { experience });
+  const experience = {
+    ...exp.toObject(),
+    availability
+  };
+
+  res.render("experience", {
+    title: experience.title,
+    experience
+  });
 };
