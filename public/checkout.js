@@ -19,12 +19,11 @@ function validateCheckout() {
   }
 }
 
-[nameInput, emailInput].forEach(input =>
+[nameInput, emailInput].forEach((input) =>
   input.addEventListener("input", validateCheckout)
 );
 
 agreeTerms.addEventListener("change", validateCheckout);
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.querySelector("[data-booking-id]");
@@ -43,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ bookingId })
+        body: JSON.stringify({ bookingId }),
       });
 
       if (!res.ok) {
@@ -67,14 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ bookingId })
+            body: JSON.stringify({ bookingId }),
           });
 
           const vd = await vr.json().catch(() => ({}));
           if (!vr.ok || !vd.success) return alert(vd.error || "Payment failed");
 
           window.location.href = "/my-bookings";
-        }
+        },
       });
 
       rzp.open();

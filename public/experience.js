@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("qtyPlus").onclick = () => updateQty(1);
   document.getElementById("qtyMinus").onclick = () => updateQty(-1);
 
-  document.getElementById("dateChips").onclick = e => {
+  document.getElementById("dateChips").onclick = (e) => {
     if (!e.target.dataset.date) return;
     selectDate(e.target.dataset.date, e.target);
   };
@@ -29,14 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
     summaryDate.textContent = date;
     summaryTime.textContent = "—";
 
-    document.querySelectorAll(".date-chip")
-      .forEach(b => b.classList.remove("bg-yellow-400"));
+    document
+      .querySelectorAll(".date-chip")
+      .forEach((b) => b.classList.remove("bg-yellow-400"));
 
     btn.classList.add("bg-yellow-400");
 
     timeSlots.innerHTML = "";
 
-    availability[date].forEach(t => {
+    availability[date].forEach((t) => {
       const b = document.createElement("button");
       b.className = "px-4 py-2 border rounded-md text-sm";
 
@@ -63,8 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedTime = time;
     summaryTime.textContent = time;
 
-    document.querySelectorAll("#timeSlots button")
-      .forEach(b => b.classList.remove("bg-yellow-300"));
+    document
+      .querySelectorAll("#timeSlots button")
+      .forEach((b) => b.classList.remove("bg-yellow-300"));
 
     btn.classList.add("bg-yellow-300");
     enableConfirm();
@@ -96,10 +98,15 @@ document.addEventListener("DOMContentLoaded", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ experienceId, date: selectedDate, time: selectedTime, qty })
+      body: JSON.stringify({
+        experienceId,
+        date: selectedDate,
+        time: selectedTime,
+        qty,
+      }),
     })
-      .then(r => r.json())
-      .then(d => {
+      .then((r) => r.json())
+      .then((d) => {
         if (!d.success) alert(d.message);
         else window.location.href = `/checkout/${d.bookingId}`;
       });

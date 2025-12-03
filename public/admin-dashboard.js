@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function calculateRevenue() {
     let total = 0;
-    cards.forEach(c => {
+    cards.forEach((c) => {
       if (c.style.display !== "none") {
         total += Number(c.dataset.amount || 0);
       }
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyFilters() {
     const q = searchInput.value.toLowerCase();
 
-    cards.forEach(card => {
+    cards.forEach((card) => {
       const pay = card.dataset.payment;
       const status = card.dataset.status;
 
@@ -31,8 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         (activeFilter === "cancelled" && status === "cancelled");
 
       const searchMatch =
-        card.dataset.email.includes(q) ||
-        card.dataset.title.includes(q);
+        card.dataset.email.includes(q) || card.dataset.title.includes(q);
 
       card.style.display = filterMatch && searchMatch ? "flex" : "none";
     });
@@ -40,9 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
     calculateRevenue();
   }
 
-  filterBtns.forEach(btn => {
+  filterBtns.forEach((btn) => {
     btn.onclick = () => {
-      filterBtns.forEach(b => b.classList.remove("active"));
+      filterBtns.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       activeFilter = btn.dataset.filter;
       applyFilters();
@@ -54,18 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
   exportBtn.onclick = () => {
     const rows = [["Experience", "Email", "Amount"]];
 
-    cards.forEach(c => {
+    cards.forEach((c) => {
       if (c.style.display !== "none") {
-        rows.push([
-          c.dataset.title,
-          c.dataset.email,
-          c.dataset.amount
-        ]);
+        rows.push([c.dataset.title, c.dataset.email, c.dataset.amount]);
       }
     });
 
-    const blob = new Blob([rows.map(r => r.join(",")).join("\n")], {
-      type: "text/csv"
+    const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], {
+      type: "text/csv",
     });
 
     const a = document.createElement("a");

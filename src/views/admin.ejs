@@ -3,6 +3,17 @@
   <h1 class="text-3xl font-bold mb-8">
     <%= isEdit ? "Edit Experience" : "Add Experience" %>
   </h1>
+  <div class="mb-4 flex gap-3">
+    <label class="bg-gray-800 text-white px-4 py-2 rounded-lg cursor-pointer font-semibold">
+      Import CSV
+      <input type="file" id="csvInput" accept=".csv" hidden />
+    </label>
+
+    <span class="text-sm text-gray-600 pt-2">
+      Upload one experience CSV
+    </span>
+  </div>
+
 
   <form method="POST" action="<%= isEdit ? `/admin/edit-experience/${experience._id}` : '/admin/add-experience' %>"
     class="bg-white p-8 rounded-2xl shadow space-y-8">
