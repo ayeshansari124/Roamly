@@ -2,7 +2,7 @@ const User = require("../models/User");
 
 exports.getHome = (req, res) => {
   res.render("index", {
-    layout: false
+    layout: false,
   });
 };
 
@@ -10,7 +10,13 @@ exports.register = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (await User.exists({ email }))
-    return res.status(400).render("error", { title: "Error", statusCode: 400, message: "User already exists" });
+    return res
+      .status(400)
+      .render("error", {
+        title: "Error",
+        statusCode: 400,
+        message: "User already exists",
+      });
 
   const user = await User.create({ name, email, password });
   req.session.userId = user._id;
@@ -29,7 +35,7 @@ exports.login = async (req, res) => {
     return res.status(401).render("error", {
       title: "Login Failed",
       statusCode: 401,
-      message: "Invalid credentials"
+      message: "Invalid credentials",
     });
   }
 
@@ -39,7 +45,6 @@ exports.login = async (req, res) => {
     res.redirect("/explore");
   });
 };
-
 
 exports.logout = (req, res) => {
   req.session.destroy(() => {

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const availabilitySchema = new mongoose.Schema(
   {
     time: { type: String, required: true },
-    slots: { type: Number, required: true, min: 0 }
+    slots: { type: Number, required: true, min: 0 },
   },
   { _id: false }
 );
@@ -20,8 +20,8 @@ const experienceSchema = new mongoose.Schema({
   availability: {
     type: Map,
     of: [availabilitySchema],
-    default: {}
-  }
+    default: {},
+  },
 });
 
 experienceSchema.index({ title: 1, location: 1 });

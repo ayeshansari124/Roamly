@@ -9,9 +9,7 @@ exports.requireLogin = (req, res, next) =>
     : deny(req, res, next, 401, "Not authenticated", true);
 
 exports.requireLoginApi = (req, res, next) =>
-  req.session.userId
-    ? next()
-    : deny(req, res, next, 401, "Not authenticated");
+  req.session.userId ? next() : deny(req, res, next, 401, "Not authenticated");
 
 exports.requireAdmin = (req, res, next) =>
   req.user?.role === "admin"

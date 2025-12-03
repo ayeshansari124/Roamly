@@ -5,14 +5,11 @@ exports.explore = async (req, res) => {
 
   const experiences = q
     ? await Experience.find({
-        $or: [
-          { title: new RegExp(q, "i") },
-          { location: new RegExp(q, "i") }
-        ]
+        $or: [{ title: new RegExp(q, "i") }, { location: new RegExp(q, "i") }],
       }).lean()
     : await Experience.find().lean();
 
-  res.render("explore", { title: "Explore", experiences, query: q });
+  res.render("explore", { title: "Explore - Experiences", experiences, query: q });
 };
 
 exports.viewExperience = async (req, res) => {
@@ -21,11 +18,10 @@ exports.viewExperience = async (req, res) => {
     return res.status(404).render("error", {
       title: "Not Found",
       statusCode: 404,
-      message: "Experience not found"
+      message: "Experience not found",
     });
   }
 
-  // ✅ normalize availability (Map → Object)
   let availability = {};
   if (exp.availability instanceof Map) {
     availability = Object.fromEntries(exp.availability);
@@ -35,11 +31,11 @@ exports.viewExperience = async (req, res) => {
 
   const experience = {
     ...exp.toObject(),
-    availability
+    availability,
   };
 
   res.render("experience", {
     title: experience.title,
-    experience
+    experience,
   });
 };

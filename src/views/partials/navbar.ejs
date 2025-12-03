@@ -6,35 +6,29 @@
       <a href="/explore" class="text-gray-600 hover:text-black"> Explore </a>
 
       <% if (isAuthenticated) { %>
-      <a href="/my-bookings" class="text-gray-600 hover:text-black">
-        My Bookings
-      </a>
+        <a href="/my-bookings" class="text-gray-600 hover:text-black">
+          My Bookings
+        </a>
 
-      <% if (userRole === "admin") { %>
-      <a href="/admin/dashboard" class="text-gray-600 hover:text-black">
-        Admin Dashboard
-      </a>
-      <% } %>
+        <% if (userRole==="admin" ) { %>
+          <a href="/admin/dashboard" class="text-gray-600 hover:text-black">
+            Admin Dashboard
+          </a>
+          <% } %>
 
-      <form action="/logout" method="POST">
-        <button class="text-red-500 hover:text-red-700">Logout</button>
-      </form>
+            <form action="/logout" method="POST">
+              <button class="text-red-500 hover:text-red-700">Logout</button>
+            </form>
 
-      <% } else { %>
-      <button
-        onclick="openModal('loginModal')"
-        class="text-gray-600 hover:text-black"
-      >
-        Login
-      </button>
+            <% } else { %>
+              <button onclick="openModal('loginModal')" class="text-gray-600 hover:text-black">
+                Login
+              </button>
 
-      <button
-        onclick="openModal('registerModal')"
-        class="text-yellow-500 hover:text-yellow-600"
-      >
-        Sign Up
-      </button>
-      <% } %>
+              <button onclick="openModal('registerModal')" class="text-yellow-500 hover:text-yellow-600">
+                Sign Up
+              </button>
+              <% } %>
     </div>
   </div>
 </nav>

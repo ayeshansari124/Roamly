@@ -4,7 +4,6 @@ const Booking = require("../models/Booking");
 function parseAvailability(req, res) {
   let availability = req.body.availability;
   let parsed = {};
-
   try {
     if (Array.isArray(availability)) {
       parsed = availability[0] ? JSON.parse(availability[0]) : {};
@@ -15,38 +14,30 @@ function parseAvailability(req, res) {
     res.status(400).render("error", {
       title: "Invalid availability",
       statusCode: 400,
-      message: "Time slots data is invalid. Please re-add slots."
+      message: "Time slots data is invalid. Please re-add slots.",
     });
     return null;
   }
-
   return parsed;
 }
 
-/* =========================
-   ADMIN DASHBOARD
-========================= */
 exports.adminBookingsPage = async (req, res) => {
   const bookings = await Booking.find()
     .populate("userId", "email")
-    .populate("experienceId", "title price") // include price as well (even though we'll use amountPaid)
+    .populate("experienceId", "title price")
     .sort("-createdAt");
 
   res.render("admin-dashboard", {
-    title: "Admin Dashboard",
-    bookings
+    title: "Admin - Bookings",
+    bookings,
   });
 };
 
-
-/* =========================
-   ADD EXPERIENCE
-========================= */
 exports.addExperiencePage = (req, res) => {
   res.render("admin", {
-    title: "Add Experience",
+    title: "Admin - Add Experience",
     experience: null,
-    isEdit: false
+    isEdit: false,
   });
 };
 
@@ -60,31 +51,28 @@ exports.createExperience = async (req, res) => {
     ...data,
     highlights: highlights
       .split(",")
-      .map(h => h.trim())
+      .map((h) => h.trim())
       .filter(Boolean),
-    availability: parsedAvailability
+    availability: parsedAvailability,
   });
 
   res.redirect("/explore");
 };
 
-/* =========================
-   EDIT EXPERIENCE
-========================= */
 exports.editExperiencePage = async (req, res) => {
   const experience = await Experience.findById(req.params.id);
   if (!experience) {
     return res.status(404).render("error", {
       title: "Error",
       statusCode: 404,
-      message: "Experience not found"
+      message: "Experience not found",
     });
   }
 
   res.render("admin", {
-    title: "Edit Experience",
+    title: "Admin - Edit Experience",
     experience,
-    isEdit: true
+    isEdit: true,
   });
 };
 
@@ -94,7 +82,7 @@ exports.updateExperience = async (req, res) => {
   const parsedAvailability = parseAvailability(req, res);
   if (parsedAvailability === null) return;
 
-  const experience = await Experience.findByIdAndUpdate(
+  const updated = await Experience.findByIdAndUpdate(
     req.params.id,
     {
       ...data,
@@ -107,7 +95,7 @@ exports.updateExperience = async (req, res) => {
     { new: true }
   );
 
-  if (!experience) {
+  if (!updated) {
     return res.status(404).render("error", {
       title: "Error",
       statusCode: 404,
@@ -118,19 +106,16 @@ exports.updateExperience = async (req, res) => {
   res.redirect("/explore");
 };
 
-/* =========================
-   DELETE EXPERIENCE
-========================= */
 exports.deleteExperience = async (req, res) => {
   const count = await Booking.countDocuments({
-    experienceId: req.params.id
+    experienceId: req.params.id,
   });
 
   if (count) {
     return res.status(400).render("error", {
       title: "Error",
       statusCode: 400,
-      message: `Cannot delete. ${count} bookings exist.`
+      message: `Cannot delete. ${count} bookings exist.`,
     });
   }
 

@@ -20,30 +20,21 @@
         <button data-filter="cancelled" class="filter-btn">Cancelled</button>
       </div>
 
-      <input
-        id="searchInput"
-        placeholder="Search email or experience..."
-        class="search-input"
-      />
+      <input id="searchInput" placeholder="Search email or experience..." class="search-input" />
 
       <button id="exportBtn" class="export-btn">Export CSV</button>
     </div>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 mt-6">
-    <% bookings.forEach(b => { %>
-      <div
-        class="booking-card bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3"
-        data-payment="<%= b.paymentStatus %>"
-        data-status="<%= b.status %>"
+    <% bookings.forEach(b=> { %>
+      <div class="booking-card bg-white rounded-xl p-4 shadow-sm flex flex-col gap-3"
+        data-payment="<%= b.paymentStatus %>" data-status="<%= b.status %>"
         data-email="<%= b.userId?.email?.toLowerCase() || "" %>"
-        data-title="<%= b.experienceId?.title?.toLowerCase() || "" %>"
-        data-date="<%= b.date %>"
-        data-time="<%= b.time %>"
-        data-qty="<%= b.qty %>"
+        data-title="<%= b.experienceId?.title?.toLowerCase() || "" %>" data-date="<%= b.date %>"
+        data-time="<%= b.time %>" data-qty="<%= b.qty %>"
         data-created="<%= new Date(b.createdAt).toLocaleDateString() %>"
-        data-amount="<%= b.paymentStatus === 'paid' ? Number(b.amountPaid || 0) : 0 %>"
-      >
+        data-amount="<%= b.paymentStatus === 'paid' ? Number(b.amountPaid || 0) : 0 %>">
 
         <!-- HEADER -->
         <div class="flex justify-between gap-2">
@@ -84,12 +75,12 @@
           </span>
 
           <span class="text-xs font-semibold text-gray-700">
-            ₹ <%= b.paymentStatus === 'paid' ? Number(b.amountPaid || 0) : 0 %>
+            ₹ <%= b.paymentStatus==='paid' ? Number(b.amountPaid || 0) : 0 %>
           </span>
         </div>
 
       </div>
-    <% }) %>
+      <% }) %>
   </div>
 
 </section>

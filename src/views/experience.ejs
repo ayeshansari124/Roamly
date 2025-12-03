@@ -1,20 +1,13 @@
-<main
-  id="experienceRoot"
-  class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-10"
-  data-availability='<%- JSON.stringify(experience.availability) %>'
-  data-price="<%= experience.price %>"
-  data-id="<%= experience._id %>"
->
+<main id="experienceRoot" class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-10"
+  data-availability='<%- JSON.stringify(experience.availability) %>' data-price="<%= experience.price %>"
+  data-id="<%= experience._id %>">
 
   <!-- LEFT -->
   <section class="lg:col-span-2 space-y-8">
 
     <div>
-      <img
-        src="<%= experience.image %>"
-        alt="<%= experience.title %>"
-        class="w-full h-[360px] object-cover rounded-xl"
-      />
+      <img src="<%= experience.image %>" alt="<%= experience.title %>"
+        class="w-full h-[360px] object-cover rounded-xl" />
 
       <h1 class="mt-6 text-2xl font-semibold">
         <%= experience.title %>
@@ -30,15 +23,12 @@
       <h3 class="font-medium mb-3">Choose date</h3>
 
       <div id="dateChips" class="flex flex-wrap gap-3">
-        <% Object.keys(experience.availability).forEach(date => { %>
-          <button
-            type="button"
-            data-date="<%= date %>"
-            class="date-chip px-4 py-2 border rounded-md text-sm hover:bg-gray-100"
-          >
+        <% Object.keys(experience.availability).forEach(date=> { %>
+          <button type="button" data-date="<%= date %>"
+            class="date-chip px-4 py-2 border rounded-md text-sm hover:bg-gray-100">
             <%= date %>
           </button>
-        <% }) %>
+          <% }) %>
       </div>
     </div>
 
@@ -66,59 +56,60 @@
   </section>
 
   <!-- RIGHT -->
-  <aside class="bg-gray-50 border rounded-xl p-6 h-fit sticky top-24 space-y-4">
+  <aside class=" bg-gray-50 border rounded-xl p-6 h-fit sticky top-24 space-y-4">
 
-    <div class="flex justify-between text-sm text-gray-600">
-      <span>Starts at</span>
-      <span class="font-semibold">₹<%= experience.price %></span>
-    </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <span>Starts at</span>
+            <span class="font-semibold">₹<%= experience.price %></span>
+          </div>
 
-    <div class="space-y-1 text-sm text-gray-600">
-      <div class="flex justify-between">
-        <span>Date</span>
-        <span id="summaryDate">—</span>
-      </div>
-      <div class="flex justify-between">
-        <span>Time</span>
-        <span id="summaryTime">—</span>
-      </div>
-    </div>
+          <div class="space-y-1 text-sm text-gray-600">
+            <div class="flex justify-between">
+              <span>Date</span>
+              <span id="summaryDate">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Time</span>
+              <span id="summaryTime">—</span>
+            </div>
+          </div>
 
-    <div class="flex justify-between items-center pt-2 text-sm">
-      <span>Quantity</span>
-      <div class="flex items-center gap-2">
-        <button id="qtyMinus" class="px-2 border rounded">−</button>
-        <span id="qty">1</span>
-        <button id="qtyPlus" class="px-2 border rounded">+</button>
-      </div>
-    </div>
+          <div class="flex justify-between items-center pt-2 text-sm">
+            <span>Quantity</span>
+            <div class="flex items-center gap-2">
+              <button id="qtyMinus" class="px-2 border rounded">−</button>
+              <span id="qty">1</span>
+              <button id="qtyPlus" class="px-2 border rounded">+</button>
+            </div>
+          </div>
 
-    <hr />
+          <hr />
 
-    <div class="space-y-1 text-sm">
-      <div class="flex justify-between">
-        <span>Subtotal</span>
-        <span>₹<span id="subTotal"><%= experience.price %></span></span>
-      </div>
-      <div class="flex justify-between">
-        <span>Taxes</span>
-        <span>₹59</span>
-      </div>
-      <div class="flex justify-between font-semibold text-base">
-        <span>Total</span>
-        <span>₹<span id="total"><%= experience.price + 59 %></span></span>
-      </div>
-    </div>
+          <div class="space-y-1 text-sm">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span>₹<span id="subTotal">
+                  <%= experience.price %>
+                </span></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Taxes</span>
+              <span>₹59</span>
+            </div>
+            <div class="flex justify-between font-semibold text-base">
+              <span>Total</span>
+              <span>₹<span id="total">
+                  <%= experience.price + 59 %>
+                </span></span>
+            </div>
+          </div>
 
-    <button
-      id="confirmBtn"
-      disabled
-      class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-medium cursor-not-allowed"
-    >
-      Confirm
-    </button>
+          <button id="confirmBtn" disabled
+            class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg font-medium cursor-not-allowed">
+            Confirm
+          </button>
 
-  </aside>
+          </aside>
 </main>
 
 <script defer src="/experience.js"></script>

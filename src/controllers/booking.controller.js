@@ -12,7 +12,9 @@ exports.bookExperience = async (req, res) => {
     const experience = await Experience.findById(experienceId).session(session);
     if (!experience) throw Error("Experience not found");
 
-    const slot = experience.availability.get(date)?.find(s => s.time === time);
+    const slot = experience.availability
+      .get(date)
+      ?.find((s) => s.time === time);
     if (!slot || slot.slots < qty) throw Error("Slots unavailable");
 
     slot.slots -= qty;
@@ -34,14 +36,15 @@ exports.bookExperience = async (req, res) => {
 };
 
 exports.checkoutPage = async (req, res) => {
-  const booking = await Booking.findById(req.params.bookingId)
-    .populate("experienceId");
+  const booking = await Booking.findById(req.params.bookingId).populate(
+    "experienceId"
+  );
 
   if (!booking) {
     return res.status(404).render("error", {
       title: "Not Found",
       statusCode: 404,
-      message: "Booking not found"
+      message: "Booking not found",
     });
   }
 
@@ -49,7 +52,7 @@ exports.checkoutPage = async (req, res) => {
   const total = subtotal + 59;
 
   res.render("checkout", {
-    title: "Checkout",
+    title: "Checkout - Booking",
     bookingId: booking._id,
     experience: booking.experienceId,
     date: booking.date,
@@ -57,14 +60,14 @@ exports.checkoutPage = async (req, res) => {
     qty: booking.qty,
     subtotal,
     total,
-    razorpayKey: process.env.RAZORPAY_KEY_ID
+    razorpayKey: process.env.RAZORPAY_KEY_ID,
   });
 };
 
 exports.myBookings = async (req, res) => {
   const bookings = await Booking.find({
     userId: req.session.userId,
-    paymentStatus: "paid"
+    paymentStatus: "paid",
   }).populate("experienceId");
 
   res.render("my-bookings", { title: "My Bookings", bookings });
@@ -76,14 +79,14 @@ exports.cancelBooking = async (req, res) => {
     return res.status(400).render("error", {
       title: "Error",
       statusCode: 400,
-      message: "Invalid booking"
+      message: "Invalid booking",
     });
   }
 
   const experience = await Experience.findById(booking.experienceId);
   const slot = experience.availability
     .get(booking.date)
-    .find(s => s.time === booking.time);
+    .find((s) => s.time === booking.time);
 
   slot.slots += booking.qty;
   booking.status = "cancelled";

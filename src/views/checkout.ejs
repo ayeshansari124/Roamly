@@ -1,48 +1,27 @@
-<section
-  class="max-w-4xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8"
-  data-booking-id="<%= bookingId %>"
-  data-razorpay-key="<%= razorpayKey %>"
-  data-title="<%= experience.title %>"
-  data-amount="<%= total %>"
->
+<section class="max-w-4xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8" data-booking-id="<%= bookingId %>"
+  data-razorpay-key="<%= razorpayKey %>" data-title="<%= experience.title %>" data-amount="<%= total %>">
 
   <!-- LEFT -->
   <div class="bg-white p-6 rounded-xl shadow">
     <h2 class="text-lg font-bold mb-4">Checkout</h2>
 
     <form class="space-y-4">
-  <input
-    id="fullName"
-    type="text"
-    placeholder="Full name"
-    required
-    class="w-full p-3 border rounded-lg"
-  />
+      <input id="fullName" type="text" placeholder="Full name" required class="w-full p-3 border rounded-lg" />
 
-  <input
-    id="email"
-    type="email"
-    placeholder="Email"
-    required
-    class="w-full p-3 border rounded-lg"
-  />
-</form>
+      <input id="email" type="email" placeholder="Email" required class="w-full p-3 border rounded-lg" />
+    </form>
 
     <div class="bg-white p-6 rounded-xl shadow md:col-span-2">
-  <div class="flex items-start gap-2 text-sm text-gray-600">
-    <input
-      type="checkbox"
-      id="agreeTerms"
-      class="mt-1"
-    />
-    <label for="agreeTerms">
-      I agree to the
-      <span class="underline cursor-pointer">Terms & Services</span>
-      and
-      <span class="underline cursor-pointer">Privacy Policy</span>
-    </label>
-  </div>
-</div>
+      <div class="flex items-start gap-2 text-sm text-gray-600">
+        <input type="checkbox" id="agreeTerms" class="mt-1" />
+        <label for="agreeTerms">
+          I agree to the
+          <span class="underline cursor-pointer">Terms & Services</span>
+          and
+          <span class="underline cursor-pointer">Privacy Policy</span>
+        </label>
+      </div>
+    </div>
 
   </div>
 
@@ -54,24 +33,29 @@
     <div class="text-sm text-gray-600 space-y-2">
       <div class="flex justify-between">
         <span>Experience</span>
-        <span><%= experience.title %></span>
+        <span>
+          <%= experience.title %>
+        </span>
       </div>
-      <div class="flex justify-between"><span>Date</span><span><%= date %></span></div>
-      <div class="flex justify-between"><span>Time</span><span><%= time %></span></div>
-      <div class="flex justify-between"><span>Qty</span><span><%= qty %></span></div>
+      <div class="flex justify-between"><span>Date</span><span>
+          <%= date %>
+        </span></div>
+      <div class="flex justify-between"><span>Time</span><span>
+          <%= time %>
+        </span></div>
+      <div class="flex justify-between"><span>Qty</span><span>
+          <%= qty %>
+        </span></div>
 
       <hr>
 
       <div class="flex justify-between"><span>Subtotal</span><span>₹<%= subtotal %></span></div>
       <div class="flex justify-between font-bold text-lg"><span>Total</span><span>₹<%= total %></span></div>
     </div>
-<button
-  id="payBtn"
-  disabled
-  class="w-full mt-4 bg-gray-300 text-gray-500 py-4 rounded-lg font-bold cursor-not-allowed"
->
-  Pay and Confirm
-</button>
+    <button id="payBtn" disabled
+      class="w-full mt-4 bg-gray-300 text-gray-500 py-4 rounded-lg font-bold cursor-not-allowed">
+      Pay and Confirm
+    </button>
 
     <form method="POST" action="/booking/<%= bookingId %>/cancel" class="mt-4">
       <button class="w-full bg-red-100 text-red-600 py-3 rounded-lg font-semibold hover:bg-red-200">

@@ -28,13 +28,13 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI
+      mongoUrl: process.env.MONGO_URI,
     }),
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      maxAge: 604800000
-    }
+      maxAge: 604800000,
+    },
   })
 );
 
@@ -64,7 +64,9 @@ app.use("/", paymentRoutes);
 app.use("/admin", adminRoutes);
 
 app.use((req, res) =>
-  res.status(404).render("error", { statusCode: 404, message: "Page not found" })
+  res
+    .status(404)
+    .render("error", { statusCode: 404, message: "Page not found" })
 );
 
 app.use(errorHandler);
