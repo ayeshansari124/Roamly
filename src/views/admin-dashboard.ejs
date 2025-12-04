@@ -34,7 +34,9 @@
         data-title="<%= b.experienceId?.title?.toLowerCase() || "" %>" data-date="<%= b.date %>"
         data-time="<%= b.time %>" data-qty="<%= b.qty %>"
         data-created="<%= new Date(b.createdAt).toLocaleDateString() %>"
-        data-amount="<%= b.paymentStatus === 'paid' ? Number(b.amountPaid || 0) : 0 %>">
+        data-amount="<%= b.paymentStatus === 'paid' ? b.amountPaid : 0 %>"
+      >₹ <%= b.amountPaid %>
+
 
         <!-- HEADER -->
         <div class="flex justify-between gap-2">
