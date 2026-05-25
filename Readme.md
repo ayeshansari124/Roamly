@@ -4,7 +4,7 @@ Roamly is a full-stack travel experience booking platform where users can explor
 
 ## 🌐 Live Demo
 
-Add your deployed link here
+https://roamly-h1t2.onrender.com/
 
 ---
 
@@ -79,7 +79,7 @@ Password: ayesha
 ---
 
 ### 🔍 Search Experiences
-![Search](./screenshots/search-experiences.png)
+![Search](./screenshots/search-experience.png)
 
 ---
 
@@ -118,7 +118,7 @@ Password: ayesha
 ---
 
 ### ➕ Add Experience
-![Add Experience](./screenshots/add-experince.png)
+![Add Experience](./screenshots/add-experience.png)
 
 ---
 
