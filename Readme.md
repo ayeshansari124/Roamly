@@ -1,47 +1,162 @@
-# Roamly – Travel Experience Booking Platform
+# 🌍 Roamly - Experience Booking Platform
 
-A full-stack travel platform to **explore curated experiences, make bookings, and complete secure online payments**.  
-Built as a real-world system with admin controls, availability management, and payment integration.
+Roamly is a full-stack travel experience booking platform where users can explore adventures, book slots, and make secure payments online.
+
+## 🌐 Live Demo
+
+Add your deployed link here
 
 ---
 
-## 🚀 Features
+## Features
 
-### 👤 User
-- Register / Login / Logout (session-based authentication)
-- Browse travel experiences
-- View experience details with date & time slots
-- Book experiences with quantity selection
-- Secure online payment (Razorpay)
-- View and cancel bookings
+### ✨ User Features
 
-### 🛠 Admin
-- Add, edit, delete experiences
-- Manage availability (date, time, slots)
+- Browse experiences without login
+- Search experiences
+- View complete experience details
+- User registration and login
+- Slot-based booking system
+- Date and time selection
+- Razorpay payment integration
+- Real-time slot reduction after booking
+- My Bookings dashboard
+- Secure logout functionality
+
+---
+
+### 🛠️ Admin Features
+
+- Admin authentication
+- Add new experiences
+- Edit and delete experiences
+- CSV import for bulk experience upload
+- Revenue and booking analytics
 - View all bookings
-- Track payment status & total revenue
-- Admin-protected routes
+- Export booking data as CSV
 
 ---
 
-## 🛠 Tech Stack
-- Node.js + Express
-- EJS + Tailwind CSS
-- MongoDB + Mongoose
-- Express Sessions + Cookies
-- Razorpay Payment Gateway
-- Connect-Mongo (session storage)
+## 🚀 Tech Stack
+
+### Frontend
+- EJS
+- CSS
+- JavaScript
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- Express Session
+- Razorpay
+- bcrypt
 
 ---
 
-## 📚 Learnings
-- Session-based authentication & role-based access control
-- Designing admin vs user workflows
-- Handling real-time availability and bookings
-- Integrating & verifying payments securely
-- Structuring scalable Express applications
-- Debugging and deploying production-ready apps
+## 🔑 Admin Credentials
+
+```bash
+Email: ayeshansari124@gmail.com
+Password: ayesha
+```
 
 ---
 
-> Built with ❤️ by Ayesha
+## 📸 Screenshots
+
+# 👤 User Side
+
+### 🏠 Homepage
+![Homepage](./screenshots/homepage.png)
+
+---
+
+### 🌍 Explore Experiences
+![Explore](./screenshots/explore-experiences.png)
+
+---
+
+### 🔍 Search Experiences
+![Search](./screenshots/search-experiences.png)
+
+---
+
+### 📖 Single Experience Page
+![Single Experience](./screenshots/single-experience.png)
+
+---
+
+### 🔐 Authentication
+![Authentication](./screenshots/authentication.png)
+
+---
+
+### 📅 Slot Booking
+![Booking](./screenshots/booking-slots.png)
+
+---
+
+### 💳 Razorpay Checkout
+![Checkout](./screenshots/checkout.png)
+
+![Razorpay](./screenshots/razorpay.png)
+
+---
+
+### 📂 My Bookings
+![Bookings](./screenshots/my-bookings.png)
+
+---
+
+# 🛠️ Admin Side
+
+### 🌍 Admin Explore
+![Admin Explore](./screenshots/admin-explore.png)
+
+---
+
+### ➕ Add Experience
+![Add Experience](./screenshots/add-experince.png)
+
+---
+
+### ✏️ Edit Experience
+![Edit Experience](./screenshots/edit-experience.png)
+
+---
+
+### 📊 Admin Dashboard
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+---
+
+## 🧠 What I Learned
+
+- Authentication and session management
+- Payment gateway integration
+- Slot booking logic
+- CSV import/export handling
+- MVC architecture
+- MongoDB schema design
+- Building admin dashboards
+- Real-world booking workflows
+
+---
+
+## 💡 Future Improvements
+
+- Email confirmations
+- Reviews and ratings
+- Google OAuth
+- Wishlist system
+- Maps integration
+
+---
+
+## 👩‍💻 Author
+
+**Ayesha Ansari**
+
+Built with ❤️ using Node.js, Express.js, MongoDB, EJS, and Razorpay
