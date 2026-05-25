@@ -34,7 +34,7 @@ exports.adminBookingsPage = async (req, res) => {
 };
 
 exports.addExperiencePage = (req, res) => {
-  res.render("admin", {
+  res.render("add-edit-experience", {
     title: "Admin - Add Experience",
     experience: null,
     isEdit: false,
