@@ -64,9 +64,9 @@ Password: ayesha
 
 ---
 
-## 📸 Screenshots
+# 📸 Screenshots
 
-# 👤 User Side
+## 👤 User Side
 
 ### 🏠 Homepage
 ![Homepage](./screenshots/homepage.png)
@@ -110,7 +110,7 @@ Password: ayesha
 
 ---
 
-# 🛠️ Admin Side
+## 🛠️ Admin Side
 
 ### 🌍 Admin Explore
 ![Admin Explore](./screenshots/admin-explore.png)
