@@ -64,71 +64,21 @@ Password: ayesha
 
 ---
 
-# 📸 Screenshots
+## 🎥 Project Demo
 
-## 👤 User Side
+### 👤 User Experience
 
-### 🏠 Homepage
-![Homepage](./screenshots/homepage.png)
+Explore experiences, search adventures, authenticate, book slots, make payments, and manage bookings.
 
----
-
-### 🌍 Explore Experiences
-![Explore](./screenshots/explore-experiences.png)
+[![User Demo](./user-demo-thumbnail.png)](https://ayeshansari124.github.io/Roamly/demo.html)
 
 ---
 
-### 🔍 Search Experiences
-![Search](./screenshots/search-experience.png)
+### 🛠️ Admin Dashboard
 
----
+Manage experiences, bookings, analytics, CSV imports, exports, and platform operations.
 
-### 📖 Single Experience Page
-![Single Experience](./screenshots/single-experience.png)
-
----
-
-### 🔐 Authentication
-![Authentication](./screenshots/authentication.png)
-
----
-
-### 📅 Slot Booking
-![Booking](./screenshots/booking-slots.png)
-
----
-
-### 💳 Razorpay Checkout
-![Checkout](./screenshots/checkout.png)
-
-![Razorpay](./screenshots/razorpay.png)
-
----
-
-### 📂 My Bookings
-![Bookings](./screenshots/my-bookings.png)
-
----
-
-## 🛠️ Admin Side
-
-### 🌍 Admin Explore
-![Admin Explore](./screenshots/admin-explore.png)
-
----
-
-### ➕ Add Experience
-![Add Experience](./screenshots/add-experience.png)
-
----
-
-### ✏️ Edit Experience
-![Edit Experience](./screenshots/edit-experience.png)
-
----
-
-### 📊 Admin Dashboard
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+[![Admin Demo](./admin-demo-thumbnail.png)](https://ayeshansari124.github.io/Roamly/demo.html)
 
 ---
 

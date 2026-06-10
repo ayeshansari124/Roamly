@@ -69,7 +69,7 @@ exports.editExperiencePage = async (req, res) => {
     });
   }
 
-  res.render("admin", {
+  res.render("add-edit-experience", {
     title: "Admin - Edit Experience",
     experience,
     isEdit: true,
