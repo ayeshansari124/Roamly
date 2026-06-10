@@ -59,7 +59,7 @@ https://roamly-h1t2.onrender.com/
 
 ```bash
 Email: ayeshansari124@gmail.com
-Password: ayesha
+Password: Admin access available for demonstration purposes upon request.
 ```
 
 ---
